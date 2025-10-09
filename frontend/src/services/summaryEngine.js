@@ -8,9 +8,12 @@ export const generateSummary = (data, location) => {
   const previous = data[1] || latest;
 
   // Calculate percentage changes
-  const vegetationChange = ((latest.vegetation_index - previous.vegetation_index) / previous.vegetation_index * 100);
-  const erosionChange = ((latest.erosion_index - previous.erosion_index) / previous.erosion_index * 100);
-  const moistureChange = ((latest.moisture_level - previous.moisture_level) / previous.moisture_level * 100);
+  const vegetationChange = ((latest.vegetation_index - previous.vegetation_index) / previous.vegetation_index) * 100;
+  const erosionChange = ((latest.erosion_index - previous.erosion_index) / previous.erosion_index) * 100;
+  const moistureChange = ((latest.moisture_level - previous.moisture_level) / previous.moisture_level) * 100;
+
+  const vegetationDelta = Number(Math.abs(vegetationChange.toFixed(1)));
+  const erosionDelta = Number(Math.abs(erosionChange.toFixed(1)));
 
   // Flag alerts
   const alerts = [];
@@ -19,21 +22,26 @@ export const generateSummary = (data, location) => {
   if (latest.moisture_level < 25) alerts.push('Low moisture content');
 
   // Generate preferred methods using recommendation engine
-  const alertDensity = data.filter(d => 
+  const alertDensity = (data.filter(d =>
     d.erosion_index > 0.75 || d.vegetation_index < 0.4 || d.moisture_level < 25
-  ).length / data.length * 100;
-  
+  ).length / data.length) * 100;
+
   const recommendations = getPreferredMethods({
     vegetation_index: latest.vegetation_index,
     erosion_index: latest.erosion_index,
     moisture_level: latest.moisture_level,
     alert_density: alertDensity
   });
-  
+
   const interventions = recommendations.methods.map(m => m.practice);
 
-  // Generate spoken summary with preferred methods
-  const spokenSummary = `${location} soil health update: Vegetation ${vegetationChange > 0 ? 'improved' : 'declined'} by ${Math.abs(vegetationChange.toFixed(1))}%. Erosion levels ${erosionChange > 0 ? 'increased' : 'decreased'} by ${Math.abs(erosionChange.toFixed(1))}%. ${alerts.length > 0 ? `${alerts.length} alerts active.` : 'No critical alerts.'} ${recommendations.summary}`;
+  // Spoken summary
+  let vegetationTrend = vegetationChange > 0 ? 'improved' : 'declined';
+  let erosionTrend = erosionChange > 0 ? 'increased' : 'decreased';
+  let alertText = alerts.length > 0 ? `${alerts.length} alerts active.` : 'No critical alerts.';
+  let priorityText = recommendations.summary;
+
+  const spokenSummary = `${location} soil health update: Vegetation ${vegetationTrend} by ${vegetationDelta}%. Erosion levels ${erosionTrend} by ${erosionDelta}%. ${alertText} ${priorityText}`;
 
   return {
     location,

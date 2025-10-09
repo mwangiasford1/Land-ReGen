@@ -79,9 +79,16 @@ export const getPreferredMethods = ({ vegetation_index, erosion_index, moisture_
   }
 
   // Determine overall priority
-  const overallUrgency = urgency.includes('critical') ? 'critical' : 
-                        urgency.includes('high') ? 'high' : 
-                        urgency.includes('medium') ? 'medium' : 'low';
+  let overallUrgency;
+  if (urgency.includes('critical')) {
+    overallUrgency = 'critical';
+  } else if (urgency.includes('high')) {
+    overallUrgency = 'high';
+  } else if (urgency.includes('medium')) {
+    overallUrgency = 'medium';
+  } else {
+    overallUrgency = 'low';
+  }
 
   // Default recommendation if no issues
   if (methods.length === 0) {
@@ -104,11 +111,18 @@ export const getPreferredMethods = ({ vegetation_index, erosion_index, moisture_
 
 const generateMethodSummary = (methods, urgency) => {
   const practices = methods.map(m => m.practice.toLowerCase()).join(', ');
-  const urgencyText = urgency === 'critical' ? 'immediate action required' : 
-                     urgency === 'high' ? 'action needed within 2 weeks' :
-                     urgency === 'medium' ? 'action recommended within a month' :
-                     'monitoring and maintenance';
-  
+  let urgencyText;
+
+  if (urgency === 'critical') {
+    urgencyText = 'immediate action required';
+  } else if (urgency === 'high') {
+    urgencyText = 'action needed within 2 weeks';
+  } else if (urgency === 'medium') {
+    urgencyText = 'action recommended within a month';
+  } else {
+    urgencyText = 'monitoring and maintenance';
+  }
+
   return `${methods.length} regenerative practice${methods.length > 1 ? 's' : ''} recommended: ${practices}. Priority level: ${urgencyText}.`;
 };
 
