@@ -16,7 +16,7 @@ const UserSettings = ({ user, onUpdate }) => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/user/settings', {
+      const response = await fetch('http://https://land-regen-1.onrender.com/user/settings', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

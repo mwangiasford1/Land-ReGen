@@ -380,6 +380,7 @@
   max-width: 1200px;
   margin: 0 auto 20px auto;
   width: 100%;
+  color:rgba(83, 137, 238, 0.4)
 }
 
 .kpi-grid {
@@ -1044,6 +1045,7 @@
 
 .header-text {
   flex: 1;
+  color: black;
 }
 
 /* Report Exporter Styles */
@@ -1132,6 +1134,7 @@
   max-width: 1200px;
   margin: 0 auto 20px auto;
   width: 100%;
+  color: rgb(130, 62, 238);
 }
 
 .methods-header {

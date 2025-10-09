@@ -8,7 +8,7 @@ const EmailTester = () => {
     setLoading(prev => ({ ...prev, [type]: true }));
     
     try {
-      const response = await fetch(`http://localhost:3000/test-email/${type}`, {
+      const response = await fetch(`http:///https://land-regen.onrender.com/${type}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
