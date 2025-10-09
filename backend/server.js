@@ -17,9 +17,7 @@ const port = process.env.PORT || 3000;
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
 // ✅ CORS configuration
-import cors from 'cors';
 
-// ✅ Use this instead of your current app.use(cors({...}))
 app.use(cors({
   origin: 'https://land-regen-1.onrender.com',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
