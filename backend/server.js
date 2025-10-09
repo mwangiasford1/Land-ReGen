@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
@@ -15,21 +16,12 @@ const app = express();
 const port = process.env.PORT || 3000;
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://land-regen-1.onrender.com');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(204);
-  }
-  next();
-});
-
-app.use((req, res, next) => {
-  console.log(`[CORS] ${req.method} ${req.url} from ${req.headers.origin}`);
-  next();
-});
+// ✅ CORS configuration
+app.use(cors({
+  origin: ['https://land-regen-1.onrender.com'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 
 app.use(helmet());
 app.use(express.json({ limit: '10mb' }));
@@ -42,6 +34,11 @@ app.use(limiter);
 app.use('/login', authLimiter);
 app.use('/register', authLimiter);
 app.use('/forgot-password', authLimiter);
+
+// ✅ Root route
+app.get('/', (req, res) => {
+  res.send('🌱 Land ReGen backend is running. Try /health or /register');
+});
 
 // ✅ Health check
 app.get('/health', (req, res) => {
