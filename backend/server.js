@@ -16,7 +16,6 @@ const app = express();
 const port = process.env.PORT || 3000;
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
-// ✅ CORS configuration
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', 'https://land-regen-1.onrender.com');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
