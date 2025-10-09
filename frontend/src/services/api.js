@@ -1,5 +1,5 @@
 // API service for Supabase backend
-const BASE_URL = 'https://land-regen.onrender.com'; // ✅ Use live backend URL
+const BASE_URL = 'https://land-regen.onrender.com'; // ✅ Correct backend/ ✅ Use live backend URL
 
 export const fetchSoilHealth = async (
   location = 'Murang\'a',
