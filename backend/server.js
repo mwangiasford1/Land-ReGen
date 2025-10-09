@@ -41,7 +41,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// ✅ Auth routes
+// ✅ Register
 app.post('/register', async (req, res) => {
   try {
     const { email, password, name, role, preferred_zone } = req.body;
@@ -71,6 +71,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
+// ✅ Login
 app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -88,7 +89,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// ✅ Forgot password
+// ✅ Forgot Password
 app.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
@@ -114,6 +115,7 @@ app.post('/forgot-password', async (req, res) => {
   }
 });
 
+// ✅ Reset Password
 app.post('/reset-password', async (req, res) => {
   try {
     const { token, password } = req.body;
@@ -170,7 +172,7 @@ app.post('/testimonials', authenticateToken, async (req, res) => {
   }
 });
 
-// ✅ Daily reports
+// ✅ Daily Reports
 app.get('/daily-reports', authenticateToken, async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -217,7 +219,7 @@ app.put('/notifications/:id/read', authenticateToken, async (req, res) => {
   }
 });
 
-// ✅ Cron jobs
+// ✅ Cron Jobs
 cron.schedule('0 8 * * *', async () => {
   await sendDailyReport(supabase);
 });
@@ -226,7 +228,7 @@ cron.schedule('0 12 * * *', async () => {
   await sendAlertEmail(supabase);
 });
 
-// ✅ Start server
+// ✅ Start Server
 app.listen(port, () => {
   console.log(`Land ReGen backend running on port ${port}`);
 });
