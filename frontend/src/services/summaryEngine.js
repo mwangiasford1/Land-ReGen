@@ -7,49 +7,52 @@ export const generateSummary = (data, location) => {
   const latest = data[0];
   const previous = data[1] || latest;
 
-  // Calculate percentage changes
-  const vegetationChange = ((latest.vegetation_index - previous.vegetation_index) / previous.vegetation_index) * 100;
-  const erosionChange = ((latest.erosion_index - previous.erosion_index) / previous.erosion_index) * 100;
-  const moistureChange = ((latest.moisture_level - previous.moisture_level) / previous.moisture_level) * 100;
+  // ✅ Ensure numeric types for calculations
+  const vegetationCurrent = parseFloat(latest.vegetation_index || 0);
+  const vegetationPrevious = parseFloat(previous.vegetation_index || vegetationCurrent);
+  const erosionCurrent = parseFloat(latest.erosion_index || 0);
+  const erosionPrevious = parseFloat(previous.erosion_index || erosionCurrent);
+  const moistureCurrent = parseFloat(latest.moisture_level || 0);
+  const moisturePrevious = parseFloat(previous.moisture_level || moistureCurrent);
 
-  const vegetationDelta = Number(Math.abs(vegetationChange.toFixed(1)));
-  const erosionDelta = Number(Math.abs(erosionChange.toFixed(1)));
+  // ✅ Calculate percentage changes
+  const vegetationChange = ((vegetationCurrent - vegetationPrevious) / vegetationPrevious) * 100;
+  const erosionChange = ((erosionCurrent - erosionPrevious) / erosionPrevious) * 100;
+  const moistureChange = ((moistureCurrent - moisturePrevious) / moisturePrevious) * 100;
 
-  // Flag alerts
+  // ✅ Flag alerts
   const alerts = [];
-  if (latest.erosion_index > 0.75) alerts.push('Critical erosion levels detected');
-  if (latest.vegetation_index < 0.4) alerts.push('Vegetation stress identified');
-  if (latest.moisture_level < 25) alerts.push('Low moisture content');
+  if (erosionCurrent > 0.75) alerts.push('Critical erosion levels detected');
+  if (vegetationCurrent < 0.4) alerts.push('Vegetation stress identified');
+  if (moistureCurrent < 25) alerts.push('Low moisture content');
 
-  // Generate preferred methods using recommendation engine
+  // ✅ Calculate alert density
   const alertDensity = (data.filter(d =>
-    d.erosion_index > 0.75 || d.vegetation_index < 0.4 || d.moisture_level < 25
+    parseFloat(d.erosion_index) > 0.75 ||
+    parseFloat(d.vegetation_index) < 0.4 ||
+    parseFloat(d.moisture_level) < 25
   ).length / data.length) * 100;
 
+  // ✅ Generate recommendations
   const recommendations = getPreferredMethods({
-    vegetation_index: latest.vegetation_index,
-    erosion_index: latest.erosion_index,
-    moisture_level: latest.moisture_level,
+    vegetation_index: vegetationCurrent,
+    erosion_index: erosionCurrent,
+    moisture_level: moistureCurrent,
     alert_density: alertDensity
   });
 
   const interventions = recommendations.methods.map(m => m.practice);
 
-  // Spoken summary
-  let vegetationTrend = vegetationChange > 0 ? 'improved' : 'declined';
-  let erosionTrend = erosionChange > 0 ? 'increased' : 'decreased';
-  let alertText = alerts.length > 0 ? `${alerts.length} alerts active.` : 'No critical alerts.';
-  let priorityText = recommendations.summary;
-
-  const spokenSummary = `${location} soil health update: Vegetation ${vegetationTrend} by ${vegetationDelta}%. Erosion levels ${erosionTrend} by ${erosionDelta}%. ${alertText} ${priorityText}`;
+  // ✅ Generate spoken summary
+  const spokenSummary = `${location} soil health update: Vegetation ${vegetationChange > 0 ? 'improved' : 'declined'} by ${Math.abs(vegetationChange.toFixed(1))}%. Erosion levels ${erosionChange > 0 ? 'increased' : 'decreased'} by ${Math.abs(erosionChange.toFixed(1))}%. ${alerts.length > 0 ? `${alerts.length} alerts active.` : 'No critical alerts.'} ${recommendations.summary}`;
 
   return {
     location,
     timestamp: latest.timestamp,
     metrics: {
-      vegetation: { current: latest.vegetation_index, change: vegetationChange },
-      erosion: { current: latest.erosion_index, change: erosionChange },
-      moisture: { current: latest.moisture_level, change: moistureChange }
+      vegetation: { current: vegetationCurrent, change: vegetationChange },
+      erosion: { current: erosionCurrent, change: erosionChange },
+      moisture: { current: moistureCurrent, change: moistureChange }
     },
     alerts,
     interventions,
