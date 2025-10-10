@@ -700,6 +700,12 @@ body {
   width: 100%;
 }
 
+.settings-header h3{
+  display: flex;
+  justify-content: space-between;
+  color: #764ba2;
+}
+
 .settings-grid {
   display: grid;
   gap: 20px;
