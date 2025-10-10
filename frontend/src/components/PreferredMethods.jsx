@@ -102,7 +102,7 @@ const PreferredMethods = ({ data, location }) => {
                 onClick={() => {
                   const subject = `Expert Consultation - ${method.category}`;
                   const body = `I need expert advice for: ${method.practice} in ${location}. Urgency: ${method.urgency}`;
-                  window.open(`mailto:expert@landregen.org?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+                  window.open(`mailto:mwangiasford12@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
                 }}
               >
                 📞 Contact Expert
