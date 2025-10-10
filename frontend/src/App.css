@@ -1,3 +1,10 @@
+body {
+  background-image: url("https://cdn.leonardo.ai/users/1fab88cf-561d-436b-8728-8fe2f04717f3/generations/23ddd9ba-7491-4289-8b6a-5ff719caf5ee/segments/3:4:1/Lucid_Origin_a_serene_and_vibrant_background_image_for_a_Susta_2.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 .app-layout {
   display: flex;
   min-height: 100vh;
