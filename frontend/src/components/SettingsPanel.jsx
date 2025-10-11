@@ -45,7 +45,7 @@ const SettingsPanel = () => {
         <h4>🌍 Language & Region</h4>
         <div className="setting-row">
           <label>Language:</label>
-          <select 
+          <select className="language-select"
             value={settings.language} 
             onChange={(e) => handleDirectChange('language', e.target.value)}
           >
