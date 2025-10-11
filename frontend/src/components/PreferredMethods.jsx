@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { getPreferredMethods, estimateCosts } from '../services/recommendationEngine';
 
 const PreferredMethods = ({ data, location }) => {
@@ -59,8 +60,8 @@ const PreferredMethods = ({ data, location }) => {
       </div>
 
       <div className="methods-grid">
-        {methodsWithCosts.map((method, index) => (
-          <div key={index} className={`method-card ${method.urgency}`}>
+        {methodsWithCosts.map((method) => (
+          <div key={`${method.category}-${method.practice}-${method.timeline}`} className={`method-card ${method.urgency}`}>
             <div className="method-header">
               <span className="method-icon">{method.icon}</span>
               <div className="method-info">
@@ -159,6 +160,17 @@ const PreferredMethods = ({ data, location }) => {
       </div>
     </div>
   );
+};
+
+PreferredMethods.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      vegetation_index: PropTypes.number.isRequired,
+      erosion_index: PropTypes.number.isRequired,
+      moisture_level: PropTypes.number.isRequired,
+    })
+  ).isRequired,
+  location: PropTypes.string.isRequired,
 };
 
 export default PreferredMethods;

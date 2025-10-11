@@ -754,10 +754,9 @@ body {
   transition: border-color 0.2s ease;
 }
 
-.language-selector select:focus {
-  border-color: #0078d4;
-  outline: none;
-  background-color: #fff;
+.setting-row {
+  background-color: #1565c0;
+  color: #0c0d0e;
 }
 
 /* Enhanced Alert Styles */
