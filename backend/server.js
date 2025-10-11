@@ -291,6 +291,18 @@ app.put('/notifications/:id/read', authenticateToken, async (req, res) => {
   }
 });
 
+// ✅ Alert Email Trigger (for frontend testing)
+app.post('/alert', async (req, res) => {
+  try {
+    console.log('📨 Alert email test triggered from frontend');
+    await sendAlertEmail(supabase); // You can pass mock data if needed
+    res.json({ success: true, message: 'Alert email sent successfully' });
+  } catch (error) {
+    console.error('Alert email error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // ✅ Cron Jobs
 cron.schedule('0 8 * * *', async () => {
   await sendDailyReport(supabase);
