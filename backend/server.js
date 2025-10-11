@@ -308,6 +308,22 @@ app.post('/alert', async (req, res) => {
     res.status(500).json({ success: false, error: error.message || 'Unknown error' });
   }
 });
+
+app.post('/daily-report', async (req, res) => {
+  try {
+    const { zone, email } = req.body;
+    console.log(`📊 Daily report email triggered for ${zone} → ${email}`);
+
+    // Replace with actual email logic
+    // await sendDailyReportEmail(supabase, { zone, email });
+
+    res.json({ success: true, message: 'Mock daily report email sent' });
+  } catch (error) {
+    console.error('Daily report error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // ✅ Cron Jobs
 cron.schedule('0 8 * * *', async () => {
   await sendDailyReport(supabase);
