@@ -1,18 +1,21 @@
 // API service for Supabase backend
-const BASE_URL = 'https://land-regen.onrender.com'; // ✅ Correct backend/ ✅ Use live backend URL
+import API_BASE_URL from '../config/api'; // ✅ Dynamic base URL
 
+// ✅ GET soil health data (protected route)
 export const fetchSoilHealth = async (
   location = 'Murang\'a',
   start = '2025-10-01',
   end = '2025-10-03'
 ) => {
   try {
+    const token = localStorage.getItem('token');
     const params = new URLSearchParams({ location, start, end });
-    const response = await fetch(`${BASE_URL}/soil-health?${params}`, {
+
+    const response = await fetch(`${API_BASE_URL}/soil-health?${params}`, {
       method: 'GET',
-      credentials: 'include', // ✅ Include cookies if needed
       headers: {
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`
       }
     });
 
@@ -24,7 +27,7 @@ export const fetchSoilHealth = async (
   } catch (error) {
     console.error('API Error:', error);
 
-    // Return mock data if API fails
+    // ✅ Return mock data if API fails
     return {
       success: true,
       data: [
@@ -49,14 +52,17 @@ export const fetchSoilHealth = async (
   }
 };
 
+// ✅ POST new soil reading (protected route)
 export const postSoilReading = async (data) => {
   try {
-    const response = await fetch(`${BASE_URL}/soil-health`, {
+    const token = localStorage.getItem('token');
+
+    const response = await fetch(`${API_BASE_URL}/soil-health`, {
       method: 'POST',
-      credentials: 'include', // ✅ Include cookies if needed
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify(data)
     });
@@ -69,5 +75,27 @@ export const postSoilReading = async (data) => {
   } catch (error) {
     console.error('POST Error:', error);
     throw error;
+  }
+};
+
+// ✅ GET testimonials (public route)
+export const fetchTestimonials = async (zone = '') => {
+  try {
+    const params = zone ? `?zone=${encodeURIComponent(zone)}` : '';
+    const response = await fetch(`${API_BASE_URL}/testimonials${params}`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Failed to fetch testimonials:', error);
+    return { success: false, data: [] };
   }
 };
