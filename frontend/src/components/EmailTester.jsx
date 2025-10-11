@@ -6,20 +6,30 @@ const EmailTester = () => {
 
   const testEmail = async (type, data = {}) => {
     setLoading(prev => ({ ...prev, [type]: true }));
-    
+
     try {
+      console.log(`Sending ${type} email with data:`, data);
+
       const response = await fetch(`https://land-regen.onrender.com/${type}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
-      
-      const result = await response.json();
+
+      const text = await response.text();
+      console.log('Raw response:', text);
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status} - ${text}`);
+      }
+
+      const result = JSON.parse(text);
       setResults(prev => ({ ...prev, [type]: result }));
     } catch (error) {
-      setResults(prev => ({ 
-        ...prev, 
-        [type]: { success: false, error: error.message } 
+      console.error('Email test error:', error.message);
+      setResults(prev => ({
+        ...prev,
+        [type]: { success: false, error: error.message }
       }));
     } finally {
       setLoading(prev => ({ ...prev, [type]: false }));
@@ -29,12 +39,16 @@ const EmailTester = () => {
   return (
     <div className="email-tester">
       <h3>📧 Email Service Tester</h3>
-      
+
+      {/* 🚨 Alert Email */}
       <div className="test-section">
         <h4>🚨 Alert Email Test</h4>
         <p>Tests soil health alert notifications</p>
-        <button 
-          onClick={() => testEmail('alert')}
+        <button
+          onClick={() => testEmail('alert', {
+            zone: 'Murang\'a',
+            email: 'your-test-email@example.com'
+          })}
           disabled={loading.alert}
         >
           {loading.alert ? 'Sending...' : 'Send Test Alert'}
@@ -47,11 +61,15 @@ const EmailTester = () => {
         )}
       </div>
 
+      {/* 📊 Daily Report */}
       <div className="test-section">
         <h4>📊 Daily Report Test</h4>
         <p>Tests daily soil health report emails</p>
-        <button 
-          onClick={() => testEmail('daily-report')}
+        <button
+          onClick={() => testEmail('daily-report', {
+            zone: 'Murang\'a',
+            email: 'your-test-email@example.com'
+          })}
           disabled={loading['daily-report']}
         >
           {loading['daily-report'] ? 'Sending...' : 'Send Test Report'}
@@ -64,6 +82,7 @@ const EmailTester = () => {
         )}
       </div>
 
+      {/* 🎉 Welcome Email */}
       <div className="test-section">
         <h4>🎉 Welcome Email Test</h4>
         <p>Tests new user welcome emails</p>
@@ -79,7 +98,7 @@ const EmailTester = () => {
           id="welcomeName"
           style={{ marginRight: '10px', padding: '8px' }}
         />
-        <button 
+        <button
           onClick={() => {
             const email = document.getElementById('welcomeEmail').value;
             const name = document.getElementById('welcomeName').value;
@@ -97,11 +116,12 @@ const EmailTester = () => {
         )}
       </div>
 
+      {/* ⚙️ Email Config Info */}
       <div className="email-config">
         <h4>⚙️ Email Configuration</h4>
         <p><strong>SMTP Host:</strong> smtp.gmail.com</p>
-        <p><strong>Email User:</strong> Configure in backend .env</p>
-        <p><strong>Status:</strong> 🟡 Check backend logs</p>
+        <p><strong>Email User:</strong> {process.env.REACT_APP_EMAIL_USER || 'Configured in backend .env'}</p>
+        <p><strong>Status:</strong> 🟡 Check backend logs for delivery</p>
       </div>
     </div>
   );
