@@ -291,6 +291,7 @@ app.put('/notifications/:id/read', authenticateToken, async (req, res) => {
   }
 });
 
+// ✅ Alert Email (for testing)
 app.post('/alert', async (req, res) => {
   try {
     console.log('📨 Alert email test triggered from frontend');

@@ -731,6 +731,35 @@ body {
   font-size: 14px;
 }
 
+.language-selector {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.language-selector label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.language-selector select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  font-size: 1rem;
+  color: #222;
+  transition: border-color 0.2s ease;
+}
+
+.language-selector select:focus {
+  border-color: #0078d4;
+  outline: none;
+  background-color: #fff;
+}
+
 /* Enhanced Alert Styles */
 .alert-time {
   font-size: 12px;
