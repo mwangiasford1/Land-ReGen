@@ -309,6 +309,7 @@ app.post('/alert', async (req, res) => {
   }
 });
 
+// ✅ Daily Report Email (for testing)
 app.post('/daily-report', async (req, res) => {
   try {
     const { zone, email } = req.body;
@@ -320,6 +321,22 @@ app.post('/daily-report', async (req, res) => {
     res.json({ success: true, message: 'Mock daily report email sent' });
   } catch (error) {
     console.error('Daily report error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ✅ Welcome Email (for testing)
+app.post('/welcome', async (req, res) => {
+  try {
+    const { email, name } = req.body;
+    console.log(`🎉 Welcome email triggered for ${name} → ${email}`);
+
+    // Replace with actual email logic if ready
+    // await sendWelcomeEmail({ email, name });
+
+    res.json({ success: true, message: 'Mock welcome email sent' });
+  } catch (error) {
+    console.error('Welcome email error:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
