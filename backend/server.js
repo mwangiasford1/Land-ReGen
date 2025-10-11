@@ -17,16 +17,30 @@ const port = process.env.PORT || 3000;
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
 // ✅ CORS configuration
+const allowedOrigins = [
+  'https://land-regen-1.onrender.com',
+  'http://localhost:3001'
+];
 
 app.use(cors({
-  origin: 'https://land-regen-1.onrender.com',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
 
-// ✅ Add this global OPTIONS handler above all routes
+// ✅ Global OPTIONS handler
 app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', 'https://land-regen-1.onrender.com');
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');
@@ -153,23 +167,17 @@ app.post('/reset-password', async (req, res) => {
   }
 });
 
-//soil health
+// ✅ Soil Health
 app.get('/soil-health', authenticateToken, async (req, res) => {
   try {
     const { location, start, end } = req.query;
 
-    // ✅ Validate required query parameters
     if (!location || !start || !end) {
-      return res.status(400).json({
-        success: false,
-        error: 'Missing location or date range'
-      });
+      return res.status(400).json({ success: false, error: 'Missing location or date range' });
     }
 
-    // ✅ Log incoming query for debugging
     console.log('Incoming soil-health query:', { location, start, end });
 
-    // ✅ Query Supabase using correct column: 'timestamp'
     const { data, error } = await supabase
       .from('soil_health')
       .select('*')
@@ -178,24 +186,15 @@ app.get('/soil-health', authenticateToken, async (req, res) => {
       .lte('timestamp', end)
       .order('timestamp', { ascending: true });
 
-    // ✅ Handle Supabase errors
     if (error) {
       console.error('Supabase query error:', error.message);
-      return res.status(500).json({
-        success: false,
-        error: 'Database query failed: ' + error.message
-      });
+      return res.status(500).json({ success: false, error: 'Database query failed: ' + error.message });
     }
 
-    // ✅ Return successful response
     res.json({ success: true, data });
   } catch (error) {
-    // ✅ Catch unexpected errors
     console.error('Soil Health Route Error:', error.message);
-    res.status(500).json({
-      success: false,
-      error: 'Internal server error: ' + error.message
-    });
+    res.status(500).json({ success: false, error: 'Internal server error: ' + error.message });
   }
 });
 
@@ -222,7 +221,18 @@ app.post('/testimonials', authenticateToken, async (req, res) => {
 
     const { data, error } = await supabase
       .from('testimonials')
-      .insert([{ user_id: req.user.id, zone, category, rating, title, comment, practices_used: JSON.stringify(practices_used || []), results_achieved, time_period, would_recommend }])
+      .insert([{
+  user_id: req.user.id,
+  zone,
+  category,
+  rating,
+  title,
+  comment,
+  practices_used: JSON.stringify(practices_used || []),
+  results_achieved,
+  time_period,
+  would_recommend
+}])
       .select();
 
     if (error) throw error;
@@ -241,6 +251,7 @@ app.get('/daily-reports', authenticateToken, async (req, res) => {
       .eq('user_id', req.user.id)
       .order('created_at', { ascending: false })
       .limit(30);
+
     if (error) throw error;
     res.json({ success: true, data });
   } catch (error) {
@@ -257,6 +268,7 @@ app.get('/notifications', authenticateToken, async (req, res) => {
       .eq('user_id', req.user.id)
       .order('created_at', { ascending: false })
       .limit(50);
+
     if (error) throw error;
     res.json({ success: true, data });
   } catch (error) {
@@ -290,5 +302,5 @@ cron.schedule('0 12 * * *', async () => {
 
 // ✅ Start Server
 app.listen(port, () => {
-  console.log(`Land ReGen backend running on port ${port}`);
+  console.log(`🚀 Land ReGen backend running on port ${port}`);
 });
