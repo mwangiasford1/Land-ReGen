@@ -13,7 +13,7 @@ const TestimonialForm = ({ zone, onSubmit }) => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/testimonials', {
+      const response = await fetch('https://land-regen.onrender.com/testimonials', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

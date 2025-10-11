@@ -153,6 +153,30 @@ app.post('/reset-password', async (req, res) => {
   }
 });
 
+//soil health
+app.get('/soil-health', authenticateToken, async (req, res) => {
+  try {
+    const { location, start, end } = req.query;
+
+    if (!location || !start || !end) {
+      return res.status(400).json({ success: false, error: 'Missing location or date range' });
+    }
+
+    const { data, error } = await supabase
+      .from('soil_health')
+      .select('*')
+      .eq('location', location)
+      .gte('date', start)
+      .lte('date', end)
+      .order('date', { ascending: true });
+
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // ✅ Testimonials
 app.get('/testimonials', async (req, res) => {
   try {
