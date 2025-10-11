@@ -56,7 +56,7 @@ const SettingsPanel = () => {
         </div>
         <div className="setting-row">
           <label>Default Zone:</label>
-          <select className="zone-selector"
+          <select className="zone-select"
             value={settings.defaultZone} 
             onChange={(e) => handleDirectChange('defaultZone', e.target.value)}
           >
