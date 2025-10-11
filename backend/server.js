@@ -158,22 +158,44 @@ app.get('/soil-health', authenticateToken, async (req, res) => {
   try {
     const { location, start, end } = req.query;
 
+    // ✅ Validate required query parameters
     if (!location || !start || !end) {
-      return res.status(400).json({ success: false, error: 'Missing location or date range' });
+      return res.status(400).json({
+        success: false,
+        error: 'Missing location or date range'
+      });
     }
 
+    // ✅ Log incoming query for debugging
+    console.log('Incoming soil-health query:', { location, start, end });
+
+    // ✅ Query Supabase using correct column: 'timestamp'
     const { data, error } = await supabase
       .from('soil_health')
       .select('*')
       .eq('location', location)
-      .gte('date', start)
-      .lte('date', end)
-      .order('date', { ascending: true });
+      .gte('timestamp', start)
+      .lte('timestamp', end)
+      .order('timestamp', { ascending: true });
 
-    if (error) throw error;
+    // ✅ Handle Supabase errors
+    if (error) {
+      console.error('Supabase query error:', error.message);
+      return res.status(500).json({
+        success: false,
+        error: 'Database query failed: ' + error.message
+      });
+    }
+
+    // ✅ Return successful response
     res.json({ success: true, data });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    // ✅ Catch unexpected errors
+    console.error('Soil Health Route Error:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error: ' + error.message
+    });
   }
 });
 
