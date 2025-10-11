@@ -56,7 +56,7 @@ const SettingsPanel = () => {
         </div>
         <div className="setting-row">
           <label>Default Zone:</label>
-          <select 
+          <select className="zone-selector"
             value={settings.defaultZone} 
             onChange={(e) => handleDirectChange('defaultZone', e.target.value)}
           >
@@ -68,7 +68,7 @@ const SettingsPanel = () => {
         </div>
         <div className="setting-row">
           <label>Units:</label>
-          <select 
+          <select className="units-select"
             value={settings.units} 
             onChange={(e) => handleDirectChange('units', e.target.value)}
           >

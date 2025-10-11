@@ -735,6 +735,14 @@ body {
   background-color: black;
   color:#27db6c;
 }
+.zone-selector {
+  background-color: black;
+  color:#27db6c;
+}
+.units-select {
+  background-color: black;
+  color:#27db6c;
+}
 
 /* Enhanced Alert Styles */
 .alert-time {
