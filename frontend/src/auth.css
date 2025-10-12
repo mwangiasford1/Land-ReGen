@@ -326,7 +326,7 @@
   border-radius: 12px;
   box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 30%, transparent);
   color: #fff;
-  transform: translateX(30px);
+  
 }
 
 .auth-container wrapper .login-box h2 {
