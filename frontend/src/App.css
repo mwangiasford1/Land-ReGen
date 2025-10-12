@@ -454,3 +454,35 @@ body {
 .alert-item, .location-item { padding: 8px 12px; background: rgba(0,0,0,0.05); border-radius: var(--radius-sm); font-size: 14px; color: var(--text-secondary); }
 .alert-item { border-left: 3px solid var(--critical); }
 .location-item { border-left: 3px solid var(--info); }
+
+/* Global text effects */
+:root { --text-glow: color-mix(in srgb, var(--accent) 35%, transparent); }
+@media (prefers-color-scheme: dark) {
+  :root { --text-glow: color-mix(in srgb, var(--accent) 60%, transparent); }
+}
+
+/* Baseline subtle shadow for general text containers */
+body, .App, .app-layout, .main-container, .main-content,
+.header, .settings-section, .settings-panel, .zone-selector,
+.kpi-tiles, .preferred-methods, .alerts-section, .report-exporter,
+.zone-comparison, .alert-history, .line-chart, .voice-command,
+.chart-tile, .kpi-tile, .service-tile, .alert-tile, .location-tile {
+  text-shadow: 0 1px 1px rgba(0,0,0,0.06);
+}
+
+/* Accent glow for headings and key labels */
+h1, h2, h3, h4,
+.tile-title,
+.methods-header h4,
+.voice-trigger h3, .voice-command h3,
+.chart-tile h3, .line-chart h3,
+.settings-header h3 {
+  text-shadow: 0 0 8px var(--text-glow), 0 1px 1px rgba(0,0,0,0.08);
+}
+
+/* Interactive emphasis */
+a:hover, .tab-btn.active,
+.action-btn:hover, .export-btn:hover,
+.voice-btn:hover {
+  text-shadow: 0 0 8px var(--text-glow);
+}
