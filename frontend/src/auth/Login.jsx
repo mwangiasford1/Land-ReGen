@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import API_BASE_URL from '../config/api';
 import { sanitizeInput, isValidEmail } from '../utils/security';
 import PropTypes from 'prop-types';
-import './login.css'; // Make sure this path is correct
+import '../auth.css';
 
 const Login = ({ onLogin, onForgotPassword }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
