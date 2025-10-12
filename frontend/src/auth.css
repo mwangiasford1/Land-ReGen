@@ -305,7 +305,7 @@
 .auth-container .wrapper {
   position: relative;
   width: min(760px, 92vw);
-  background: transparent;
+  
   border: 1.5px solid var(--accent);
   overflow: hidden;
   box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 50%, transparent);
