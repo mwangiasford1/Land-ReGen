@@ -456,7 +456,6 @@ body {
 .location-item { border-left: 3px solid var(--info); }
 
 /* Global text effects */
-:root { --text-glow: color-mix(in srgb, var(--accent) 35%, transparent); }
 @media (prefers-color-scheme: dark) {
   :root { --text-glow: color-mix(in srgb, var(--accent) 60%, transparent); }
 }

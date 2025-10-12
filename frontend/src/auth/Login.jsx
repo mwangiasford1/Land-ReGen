@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import API_BASE_URL from '../config/api';
 import { sanitizeInput, isValidEmail } from '../utils/security';
-import PropTypes from 'prop-types';
-import '../auth.css';
+import './auth.css'; // Adjust path if needed
 
-const Login = ({ onLogin, onForgotPassword }) => {
+const Login = ({ onLogin, onForgotPassword, onCreateAccount }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -53,38 +53,49 @@ const Login = ({ onLogin, onForgotPassword }) => {
     <div className="auth-container">
       <div className="wrapper">
         <div className="login-box">
-          <h2>🌱 Welcome to Land ReGen</h2>
-          <p>Monitor soil health across Kenya</p>
+          <form onSubmit={handleSubmit} className="auth-form">
+            <h2>🌱 Welcome to Land ReGen</h2>
+            <p>Monitor soil health across Kenya</p>
 
-          {error && <div className="error">{error}</div>}
+            {error && <div className="error">{error}</div>}
 
-          <input
-            type="email"
-            placeholder="Enter your email"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            required
-            autoComplete="email"
-            inputMode="email"
-          />
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              required
+              autoComplete="email"
+              inputMode="email"
+              aria-label="Email"
+            />
 
-          <input
-            type="password"
-            placeholder="Enter your password"
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            required
-            minLength={6}
-            autoComplete="current-password"
-          />
+            <input
+              type="password"
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              required
+              minLength={6}
+              autoComplete="current-password"
+              aria-label="Password"
+            />
 
-          <button type="submit" disabled={loading}>
-            {loading ? '🔄 Signing in...' : '🚀 Sign In'}
-          </button>
+            <button type="submit" disabled={loading}>
+              {loading ? '🔄 Signing in...' : '🚀 Sign In'}
+            </button>
 
-          <button type="button" onClick={onForgotPassword}>
-            Forgot your password?
-          </button>
+            <button type="button" onClick={onForgotPassword}>
+              Forgot your password?
+            </button>
+
+            <div className="auth-toggle">
+              <p>New to Land ReGen?</p>
+              <button type="button" onClick={onCreateAccount}>
+                Create Account
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -94,6 +105,7 @@ const Login = ({ onLogin, onForgotPassword }) => {
 Login.propTypes = {
   onLogin: PropTypes.func.isRequired,
   onForgotPassword: PropTypes.func.isRequired,
+  onCreateAccount: PropTypes.func.isRequired
 };
 
 export default Login;
