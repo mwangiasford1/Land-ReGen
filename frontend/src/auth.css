@@ -109,6 +109,7 @@
   background: var(--surface);
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.05s ease;
+  margin: 0.25rem 0;
 }
 
 .auth-form input::placeholder,
