@@ -121,37 +121,56 @@ app.post('/login', async (req, res) => {
 });
 
 // ✅ Forgot Password
-
-
 app.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
 
-    const { data: user } = await supabase.from('users').select('*').eq('email', email).single();
-    if (!user) return res.status(404).json({ success: false, error: 'Email not found' });
+    // 🔍 Check if user exists
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
 
+    if (userError || !user) {
+      console.warn(`⚠️ Email not found: ${email}`);
+      return res.status(404).json({ success: false, error: 'Email not found' });
+    }
+
+    // 🔐 Generate secure token and expiry
     const crypto = await import('crypto');
     const resetToken = crypto.randomBytes(32).toString('hex');
     const resetExpiry = new Date(Date.now() + 3600000); // 1 hour
 
-    await supabase
+    // 🧠 Store token and expiry in Supabase
+    const { error: updateError } = await supabase
       .from('users')
-      .update({ reset_token: resetToken, reset_expiry: resetExpiry.toISOString() })
+      .update({
+        reset_token: resetToken,
+        reset_expiry: resetExpiry.toISOString()
+      })
       .eq('email', email);
 
-    const resetUrl = `https://land-regen-1.onrender.com/reset?token=${resetToken}`;
-    console.log('Reset token generated:', resetToken);
+    if (updateError) {
+      console.error(`❌ Failed to store reset token:`, updateError.message);
+      return res.status(500).json({ success: false, error: 'Failed to store reset token' });
+    }
 
-    // ✅ Send the reset email
+    // 📧 Construct reset URL and send email
+    const resetUrl = `https://land-regen-1.onrender.com/reset?token=${resetToken}`;
+    console.log(`📨 Reset token generated: ${resetToken}`);
+    console.log(`📧 Sending reset email to ${email} → ${resetUrl}`);
+
     await sendResetEmail(email, resetUrl);
     console.log(`✅ Reset email sent to ${email}`);
 
     res.json({ success: true, message: 'Reset email sent' });
   } catch (error) {
     console.error(`❌ Forgot password error:`, error.message);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
+
 // ✅ Reset Password
 app.post('/reset-password', async (req, res) => {
   try {
