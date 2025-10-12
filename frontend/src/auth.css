@@ -9,7 +9,7 @@
 
 :root {
   /* Brand & accent */
-  --brand-1: #2e7d32; /* primary green */
+  --brand-1: #12dd1c; /* primary green */
   --brand-2: #191b19; /* deeper green */
   --accent: #00e5ff;  /* neon cyan */
   --accent-strong: #00c6ff;
@@ -305,7 +305,7 @@
 .auth-container .wrapper {
   position: relative;
   width: min(760px, 92vw);
-  
+  background: transparent;
   border: 1.5px solid var(--accent);
   overflow: hidden;
   box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 50%, transparent);
