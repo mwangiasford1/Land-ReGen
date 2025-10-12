@@ -6,6 +6,7 @@ const VoiceCommand = ({ onLocationCommand, onSummaryRequest, data, location, voi
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [recognition, setRecognition] = useState(null);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const generateVoiceSummary = useCallback(() => {
     const summary = generateSummary(data, location);
@@ -34,11 +35,10 @@ const VoiceCommand = ({ onLocationCommand, onSummaryRequest, data, location, voi
   }, [onLocationCommand, onSummaryRequest, generateVoiceSummary]);
 
   useEffect(() => {
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const recognitionInstance = new SpeechRecognition();
-
-      recognitionInstance.continuous = false;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SR) {
+      const recognitionInstance = new SR();
+      recognitionInstance.continuous = true;
       recognitionInstance.interimResults = false;
       recognitionInstance.lang = 'en-US';
 
@@ -48,29 +48,47 @@ const VoiceCommand = ({ onLocationCommand, onSummaryRequest, data, location, voi
         processCommand(speechResult);
       };
 
+      recognitionInstance.onstart = () => setIsListening(true);
       recognitionInstance.onend = () => setIsListening(false);
       recognitionInstance.onerror = (event) => {
         console.error('Speech recognition error:', event.error);
+        setErrorMsg(`Speech recognition error: ${event.error}`);
         setIsListening(false);
       };
 
       setRecognition(recognitionInstance);
+    } else {
+      setErrorMsg('Voice recognition is not supported in this browser. Using simulation.');
     }
   }, [processCommand]);
 
   const startListening = () => {
     if (!voiceSettings?.enabled) {
-      alert('Voice commands are disabled in settings');
+      setErrorMsg('Voice commands are disabled in settings.');
       return;
     }
 
     setTranscript('');
+    setErrorMsg('');
+
     if (recognition && !voiceSettings?.simulationMode) {
-      setIsListening(true);
-      recognition.start();
+      try {
+        recognition.start();
+      } catch (e) {
+        console.error('SpeechRecognition start failed:', e);
+        setErrorMsg('Microphone blocked or unavailable. Falling back to simulation.');
+        simulateVoiceCommand();
+      }
     } else {
       simulateVoiceCommand();
     }
+  };
+
+  const stopListening = () => {
+    if (recognition) {
+      try { recognition.stop(); } catch (err) { console.warn('SpeechRecognition stop failed:', err); }
+    }
+    setIsListening(false);
   };
 
   const simulateVoiceCommand = () => {
@@ -92,14 +110,29 @@ const VoiceCommand = ({ onLocationCommand, onSummaryRequest, data, location, voi
     <div className="voice-command">
       <h3>🎤 Voice Commands</h3>
 
-      <button
-        aria-label="Start voice command"
-        className={`voice-btn ${isListening ? 'listening' : ''}`}
-        onClick={startListening}
-        disabled={isListening}
-      >
-        {isListening ? '🎤 Listening...' : '🎤 Start Voice Command'}
-      </button>
+      {!isListening ? (
+        <button
+          aria-label="Start voice command"
+          className="voice-btn"
+          onClick={startListening}
+        >
+          🎤 Start Voice Command
+        </button>
+      ) : (
+        <button
+          aria-label="Stop voice command"
+          className="voice-btn listening"
+          onClick={stopListening}
+        >
+          ⏹️ Stop Listening
+        </button>
+      )}
+
+      {errorMsg && (
+        <div className="error" style={{ marginTop: '10px' }}>
+          {errorMsg}
+        </div>
+      )}
 
       {transcript && (
         <div className="transcript">

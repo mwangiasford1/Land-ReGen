@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import API_BASE_URL from '../config/api';
+import PropTypes from 'prop-types';
 
 const UserSettings = ({ user, onUpdate }) => {
   const [settings, setSettings] = useState({
@@ -16,7 +18,7 @@ const UserSettings = ({ user, onUpdate }) => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://land-regen-1.onrender.com/user/settings', {
+      const response = await fetch(`${API_BASE_URL}/user/settings`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -53,8 +55,9 @@ const UserSettings = ({ user, onUpdate }) => {
 
       <form onSubmit={handleSubmit}>
         <div className="setting-group">
-          <label>Preferred Zone:</label>
+          <label htmlFor="preferred_zone">Preferred Zone:</label>
           <select
+            id="preferred_zone"
             value={settings.preferred_zone}
             onChange={(e) =>
               setSettings({ ...settings, preferred_zone: e.target.value })
@@ -76,7 +79,7 @@ const UserSettings = ({ user, onUpdate }) => {
                 setSettings({ ...settings, email_notifications: e.target.checked })
               }
             />
-            Email Notifications
+            <span> Email Notifications</span>
           </label>
         </div>
 
@@ -89,7 +92,7 @@ const UserSettings = ({ user, onUpdate }) => {
                 setSettings({ ...settings, daily_reports: e.target.checked })
               }
             />
-            Daily Email Reports
+            <span> Daily Email Reports</span>
           </label>
         </div>
 
@@ -99,6 +102,17 @@ const UserSettings = ({ user, onUpdate }) => {
       </form>
     </div>
   );
+};
+
+UserSettings.propTypes = {
+  user: PropTypes.shape({
+    preferred_zone: PropTypes.string,
+    email_notifications: PropTypes.bool,
+    daily_reports: PropTypes.bool,
+    name: PropTypes.string,
+    role: PropTypes.string,
+  }),
+  onUpdate: PropTypes.func.isRequired,
 };
 
 export default UserSettings;

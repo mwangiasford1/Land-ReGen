@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_BASE_URL from '../config/api';
 
 const TestimonialList = ({ zone }) => {
   const [testimonials, setTestimonials] = useState([]);
@@ -10,7 +11,8 @@ const TestimonialList = ({ zone }) => {
 
   const fetchTestimonials = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/testimonials?zone=${zone}`);
+      const params = zone ? `?zone=${encodeURIComponent(zone)}` : '';
+      const response = await fetch(`${API_BASE_URL}/testimonials${params}`);
       const data = await response.json();
       
       if (data.success) {

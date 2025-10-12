@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import API_BASE_URL from '../config/api';
+import PropTypes from 'prop-types';
 
 const ForgotPassword = ({ onBack }) => {
   const [email, setEmail] = useState('');
@@ -83,6 +84,10 @@ const ForgotPassword = ({ onBack }) => {
       </button>
     </form>
   );
+};
+
+ForgotPassword.propTypes = {
+  onBack: PropTypes.func.isRequired,
 };
 
 export default ForgotPassword;

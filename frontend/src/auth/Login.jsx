@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import API_BASE_URL from '../config/api';
 import { sanitizeInput, isValidEmail } from '../utils/security';
+import PropTypes from 'prop-types';
 
 const Login = ({ onLogin, onForgotPassword }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -98,6 +99,11 @@ const Login = ({ onLogin, onForgotPassword }) => {
       </button>
     </form>
   );
+};
+
+Login.propTypes = {
+  onLogin: PropTypes.func.isRequired,
+  onForgotPassword: PropTypes.func.isRequired,
 };
 
 export default Login;
