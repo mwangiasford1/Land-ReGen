@@ -5,13 +5,75 @@ const SettingsPanel = () => {
   const { settings, updateSettings, resetSettings } = useSettings();
   const [activeTab, setActiveTab] = useState('general');
 
+  // Simple i18n map for Settings
+  const I18N = {
+    english: {
+      settings_title: 'Settings',
+      reset_all: 'Reset All',
+      tab_general: 'General',
+      tab_alerts: 'Alerts',
+      tab_voice: 'Voice',
+      tab_display: 'Display',
+      tab_data: 'Data',
+      tab_ai: 'AI',
+      user_role: 'User Role',
+      role_field_agent: 'Field Agent (Read-only)',
+      role_analyst: 'Analyst (Full Access)',
+      role_admin: 'Admin (Configuration)',
+      lang_region: 'Language & Region',
+      language: 'Language',
+      default_zone: 'Default Zone',
+      units: 'Units',
+      saved_locally: 'Settings are automatically saved locally'
+    },
+    kiswahili: {
+      settings_title: 'Mipangilio',
+      reset_all: 'Weka upya yote',
+      tab_general: 'Jumla',
+      tab_alerts: 'Arifa',
+      tab_voice: 'Sauti',
+      tab_display: 'Onyesho',
+      tab_data: 'Data',
+      tab_ai: 'AI',
+      user_role: 'Jukumu la Mtumiaji',
+      role_field_agent: 'Wakala wa Shambani (Soma tu)',
+      role_analyst: 'Mchambuzi (Ufikiaji Kamili)',
+      role_admin: 'Msimamizi (Usanidi)',
+      lang_region: 'Lugha na Eneo',
+      language: 'Lugha',
+      default_zone: 'Eneo Chaguo-msingi',
+      units: 'Vitengo',
+      saved_locally: 'Mipangilio huifadhiwa moja kwa moja kifaa chako'
+    },
+    kikuyu: {
+      settings_title: 'Mîthenya',
+      reset_all: 'Rîorora mothe',
+      tab_general: 'Gûtûûra',
+      tab_alerts: 'Mîhîrîga',
+      tab_voice: 'Kûigua',
+      tab_display: 'Kûonania',
+      tab_data: 'Mîhenya',
+      tab_ai: 'AI',
+      user_role: 'Mwîaria wa Mûndû',
+      role_field_agent: 'Mûthîîni wa Mûgûnda (Kûsomera mwerî)',
+      role_analyst: 'Mûcambûzi (Wîra wothe)',
+      role_admin: 'Mûthamirîria (Kûgûcokia)',
+      lang_region: 'Gûciarîria na Hinya',
+      language: 'Gûtûma',
+      default_zone: 'Itene ya Rîa',
+      units: 'Mîbao',
+      saved_locally: 'Mîthenya ikûgîrîrio ha mûthithî wa gûtûma'
+    }
+  };
+  const t = (key) => I18N[settings.language]?.[key] || I18N.english[key] || key;
+
   const tabs = [
-    { id: 'general', label: '🌍 General', icon: '🌍' },
-    { id: 'alerts', label: '🔔 Alerts', icon: '🔔' },
-    { id: 'voice', label: '🎤 Voice', icon: '🎤' },
-    { id: 'display', label: '📊 Display', icon: '📊' },
-    { id: 'data', label: '📦 Data', icon: '📦' },
-    { id: 'ai', label: '🧠 AI', icon: '🧠' }
+    { id: 'general', icon: '🌍' },
+    { id: 'alerts', icon: '🔔' },
+    { id: 'voice', icon: '🎤' },
+    { id: 'display', icon: '📊' },
+    { id: 'data', icon: '📦' },
+    { id: 'ai', icon: '🧠' }
   ];
 
   const handleSettingChange = (category, key, value) => {
@@ -30,21 +92,21 @@ const SettingsPanel = () => {
   const renderGeneralTab = () => (
     <div className="settings-tab">
       <div className="setting-group">
-        <h4>👤 User Role</h4>
+        <h4>👤 {t('user_role')}</h4>
         <select 
           value={settings.userRole} 
           onChange={(e) => handleDirectChange('userRole', e.target.value)}
         >
-          <option value="field-agent">Field Agent (Read-only)</option>
-          <option value="analyst">Analyst (Full Access)</option>
-          <option value="admin">Admin (Configuration)</option>
+          <option value="field-agent">{t('role_field_agent')}</option>
+          <option value="analyst">{t('role_analyst')}</option>
+          <option value="admin">{t('role_admin')}</option>
         </select>
       </div>
 
       <div className="setting-group">
-        <h4>🌍 Language & Region</h4>
+        <h4>🌍 {t('lang_region')}</h4>
         <div className="setting-row">
-          <label>Language:</label>
+          <label>{t('language')}:</label>
           <select className="language-select"
             value={settings.language} 
             onChange={(e) => handleDirectChange('language', e.target.value)}
@@ -55,7 +117,7 @@ const SettingsPanel = () => {
           </select>
         </div>
         <div className="setting-row">
-          <label>Default Zone:</label>
+          <label>{t('default_zone')}:</label>
           <select className="zone-select"
             value={settings.defaultZone} 
             onChange={(e) => handleDirectChange('defaultZone', e.target.value)}
@@ -67,7 +129,7 @@ const SettingsPanel = () => {
           </select>
         </div>
         <div className="setting-row">
-          <label>Units:</label>
+          <label>{t('units')}:</label>
           <select className="units-select"
             value={settings.units} 
             onChange={(e) => handleDirectChange('units', e.target.value)}
@@ -335,9 +397,9 @@ const SettingsPanel = () => {
   return (
     <div className="settings-panel">
       <div className="settings-header">
-        <h3>⚙️ Settings</h3>
+        <h3>⚙️ {t('settings_title')}</h3>
         <button className="reset-btn" onClick={resetSettings}>
-          🔄 Reset All
+          🔄 {t('reset_all')}
         </button>
       </div>
 
@@ -348,7 +410,7 @@ const SettingsPanel = () => {
             className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
             onClick={() => setActiveTab(tab.id)}
           >
-            {tab.icon} {tab.label}
+            {tab.icon} {t(`tab_${tab.id}`)}
           </button>
         ))}
       </div>
@@ -358,7 +420,7 @@ const SettingsPanel = () => {
       </div>
 
       <div className="settings-footer">
-        <p>Settings are automatically saved locally</p>
+        <p>{t('saved_locally')}</p>
       </div>
     </div>
   );
