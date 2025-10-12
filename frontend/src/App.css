@@ -112,12 +112,19 @@ body {
 
 .header-content {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 12px;
   width: 100%;
+  text-align: center;
 }
 
-.header-text { flex: 1; color: var(--text-primary); }
+.header .data-freshness {
+  align-items: center;
+}
+
+.header-text { color: var(--text-primary); text-align: center; }
 
 /* Cards and tiles */
 .kpi-tile,
@@ -399,7 +406,7 @@ body {
   .testimonial-form, .testimonial-list { padding: 15px; }
   .settings-section { padding: 15px; width: 100%; max-width: 100%; box-sizing: border-box; }
   .zone-selector, .kpi-tiles, .preferred-methods, .testimonial-form, .testimonial-list, .email-tester { width: 100%; max-width: 100%; box-sizing: border-box; margin: 0; }
-  .header-content { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .header-content { flex-direction: column; align-items: center; gap: 10px; }
   .logout-btn { width: 100%; max-width: 200px; }
 }
 
