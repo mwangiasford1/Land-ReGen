@@ -27,6 +27,7 @@ const ForgotPassword = ({ onBack }) => {
         setError(data.error);
       }
     } catch (err) {
+      console.error('ForgotPassword error:', err);
       setError('Failed to send reset email. Please try again.');
     } finally {
       setLoading(false);
