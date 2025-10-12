@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import API_BASE_URL from '../config/api';
 import { sanitizeInput, isValidEmail } from '../utils/security';
 import PropTypes from 'prop-types';
+import './login.css'; // Make sure this path is correct
 
 const Login = ({ onLogin, onForgotPassword }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -49,55 +50,44 @@ const Login = ({ onLogin, onForgotPassword }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="auth-form">
-      <h2>🌱 Welcome to Land ReGen</h2>
-      <p style={{ textAlign: 'center', color: '#666', marginBottom: '1.5rem' }}>
-        Monitor soil health across Kenya
-      </p>
+    <div className="auth-container">
+      <div className="wrapper">
+        <div className="login-box">
+          <h2>🌱 Welcome to Land ReGen</h2>
+          <p>Monitor soil health across Kenya</p>
 
-      {error && <div className="error">{error}</div>}
+          {error && <div className="error">{error}</div>}
 
-      <input
-        type="email"
-        aria-label="Email"
-        placeholder="Enter your email"
-        value={formData.email}
-        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-        required
-        autoComplete="email"
-        inputMode="email"
-      />
+          <input
+            type="email"
+            placeholder="Enter your email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            required
+            autoComplete="email"
+            inputMode="email"
+          />
 
-      <input
-        type="password"
-        aria-label="Password"
-        placeholder="Enter your password"
-        value={formData.password}
-        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-        required
-        minLength={6}
-        autoComplete="current-password"
-      />
+          <input
+            type="password"
+            placeholder="Enter your password"
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            required
+            minLength={6}
+            autoComplete="current-password"
+          />
 
-      <button type="submit" disabled={loading}>
-        {loading ? '🔄 Signing in...' : '🚀 Sign In'}
-      </button>
+          <button type="submit" disabled={loading}>
+            {loading ? '🔄 Signing in...' : '🚀 Sign In'}
+          </button>
 
-      <button
-        type="button"
-        onClick={onForgotPassword}
-        style={{
-          background: 'transparent',
-          color: '#666',
-          border: 'none',
-          marginTop: '10px',
-          cursor: 'pointer',
-          fontSize: '14px'
-        }}
-      >
-        Forgot your password?
-      </button>
-    </form>
+          <button type="button" onClick={onForgotPassword}>
+            Forgot your password?
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 
