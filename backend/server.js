@@ -121,6 +121,8 @@ app.post('/login', async (req, res) => {
 });
 
 // ✅ Forgot Password
+
+
 app.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
@@ -140,12 +142,16 @@ app.post('/forgot-password', async (req, res) => {
     const resetUrl = `https://land-regen-1.onrender.com/reset?token=${resetToken}`;
     console.log('Reset token generated:', resetToken);
 
-    res.json({ success: true, message: 'Reset email sent', resetUrl });
+    // ✅ Send the reset email
+    await sendResetEmail(email, resetUrl);
+    console.log(`✅ Reset email sent to ${email}`);
+
+    res.json({ success: true, message: 'Reset email sent' });
   } catch (error) {
+    console.error(`❌ Forgot password error:`, error.message);
     res.status(500).json({ success: false, error: error.message });
   }
 });
-
 // ✅ Reset Password
 app.post('/reset-password', async (req, res) => {
   try {
