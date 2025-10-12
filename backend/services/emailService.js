@@ -1,13 +1,16 @@
 import nodemailer from 'nodemailer';
 
-// ✅ Create transporter using Gmail SMTP
+// ✅ Create transporter using Gmail SMTP with TLS fallback
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST, // e.g., smtp.gmail.com
-  port: parseInt(process.env.EMAIL_PORT) || 587,
-  secure: false,
+  host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.EMAIL_PORT, 10) || 587,
+  secure: false, // TLS via STARTTLS
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
+  },
+  tls: {
+    rejectUnauthorized: false // Helps avoid handshake issues on Render
   }
 });
 
