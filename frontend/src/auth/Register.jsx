@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import API_BASE_URL from '../config/api';
 import { sanitizeInput, isValidEmail, isStrongPassword } from '../utils/security';
-import './auth.css'; // Adjust path if needed
+import '../auth.css'; // Adjust path if needed
 
 const Register = ({ onRegister }) => {
   const [formData, setFormData] = useState({
