@@ -5,36 +5,24 @@
   align-items: center;
   min-height: 100vh;
   width: 100vw;
-  background: transparent;
+  background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
   padding: 2rem;
   box-sizing: border-box;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1000;
-  overflow: hidden;
-  border-radius: 15px;
-  box-shadow: 0 0 25px #0eff;
-  position: relative;
 }
 
 .auth-form {
- .login-box {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
   width: 100%;
-  max-width: 400px;
-  padding: 40px;
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 10px;
-  box-shadow: 0 0 15px #0ef;
-  color: #fff;
-
-}
-
-.auth-form h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  font-size: 28px;
-  color: rgb(6, 7, 7);
+  max-width: 450px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .auth-toggle {
@@ -42,21 +30,6 @@
   margin-top: 1.5rem;
   color: white;
 }
-
-/ Input fields /
-.login-box input[type="text"],
-.login-box input[type="password"] {
-  width: 100%;
-  padding: 12px 20px;
-  margin: 10px 0;
-  border: none;
-  border-bottom: 2px solid #0ef;
-  background: transparent;
-  color: #fff;
-  font-size: 16px;
-  outline: none;
-}
-
 
 .auth-toggle button {
   background: none;
