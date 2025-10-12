@@ -1,3 +1,4 @@
+// server.js
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -8,7 +9,11 @@ import jwt from 'jsonwebtoken';
 import cron from 'node-cron';
 import { createClient } from '@supabase/supabase-js';
 import { authenticateToken } from './middleware/auth.js';
-import { sendAlertEmail, sendDailyReport } from './services/emailService.js';
+import {
+  sendAlertEmail,
+  sendDailyReport,
+  sendResetEmail
+} from './services/emailService.js';
 
 dotenv.config();
 
@@ -16,7 +21,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
-// ✅ CORS configuration
+// ✅ CORS
 const allowedOrigins = [
   'https://land-regen-1.onrender.com',
   'http://localhost:3001'
@@ -35,7 +40,6 @@ app.use(cors({
   credentials: true
 }));
 
-// ✅ Global OPTIONS handler
 app.options('*', (req, res) => {
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) {
@@ -50,7 +54,7 @@ app.options('*', (req, res) => {
 app.use(helmet());
 app.use(express.json({ limit: '10mb' }));
 
-// ✅ Rate limiting
+// ✅ Rate Limiting
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5 });
 
@@ -59,12 +63,11 @@ app.use('/login', authLimiter);
 app.use('/register', authLimiter);
 app.use('/forgot-password', authLimiter);
 
-// ✅ Root route
+// ✅ Root & Health
 app.get('/', (req, res) => {
   res.send('🌱 Land ReGen backend is running. Try /health or /register');
 });
 
-// ✅ Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
@@ -135,9 +138,9 @@ app.post('/forgot-password', async (req, res) => {
       .eq('email', email);
 
     const resetUrl = `https://land-regen-1.onrender.com/reset?token=${resetToken}`;
-    console.log('Reset token generated:', resetToken);
+    await sendResetEmail(email, resetUrl);
 
-    res.json({ success: true, message: 'Reset email sent', resetUrl });
+    res.json({ success: true, message: 'Reset email sent successfully' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -171,12 +174,9 @@ app.post('/reset-password', async (req, res) => {
 app.get('/soil-health', authenticateToken, async (req, res) => {
   try {
     const { location, start, end } = req.query;
-
     if (!location || !start || !end) {
       return res.status(400).json({ success: false, error: 'Missing location or date range' });
     }
-
-    console.log('Incoming soil-health query:', { location, start, end });
 
     const { data, error } = await supabase
       .from('soil_health')
@@ -186,15 +186,10 @@ app.get('/soil-health', authenticateToken, async (req, res) => {
       .lte('timestamp', end)
       .order('timestamp', { ascending: true });
 
-    if (error) {
-      console.error('Supabase query error:', error.message);
-      return res.status(500).json({ success: false, error: 'Database query failed: ' + error.message });
-    }
-
+    if (error) throw error;
     res.json({ success: true, data });
   } catch (error) {
-    console.error('Soil Health Route Error:', error.message);
-    res.status(500).json({ success: false, error: 'Internal server error: ' + error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -222,22 +217,22 @@ app.post('/testimonials', authenticateToken, async (req, res) => {
     const { data, error } = await supabase
       .from('testimonials')
       .insert([{
-  user_id: req.user.id,
-  zone,
-  category,
-  rating,
-  title,
-  comment,
-  practices_used: JSON.stringify(practices_used || []),
-  results_achieved,
-  time_period,
-  would_recommend
-}])
+        user_id: req.user.id,
+        zone,
+        category,
+        rating,
+        title,
+        comment,
+        practices_used: JSON.stringify(practices_used || []),
+        results_achieved,
+        time_period,
+        would_recommend
+      }])
       .select();
 
     if (error) throw error;
     res.json({ success: true, data: data[0] });
-  } catch (error) {
+      } catch (error) {
     res.status(400).json({ success: false, error: error.message });
   }
 });
@@ -291,16 +286,12 @@ app.put('/notifications/:id/read', authenticateToken, async (req, res) => {
   }
 });
 
-// ✅ Alert Email (for testing)
+// ✅ Alert Email (manual trigger for testing)
 app.post('/alert', async (req, res) => {
   try {
-    console.log('📨 Alert email test triggered from frontend');
-
-    // Optional: mock zone or recipient for testing
     const mockZone = req.body.zone || 'Murang\'a';
     const mockRecipient = req.body.email || 'test@example.com';
 
-    // Pass mock data to your email service
     await sendAlertEmail(supabase, { zone: mockZone, recipient: mockRecipient });
 
     res.json({ success: true, message: 'Alert email sent successfully' });
@@ -310,13 +301,13 @@ app.post('/alert', async (req, res) => {
   }
 });
 
-// ✅ Daily Report Email (for testing)
+// ✅ Daily Report Email (manual trigger for testing)
 app.post('/daily-report', async (req, res) => {
   try {
     const { zone, email } = req.body;
     console.log(`📊 Daily report email triggered for ${zone} → ${email}`);
 
-    // Replace with actual email logic
+    // Replace with actual email logic if ready
     // await sendDailyReportEmail(supabase, { zone, email });
 
     res.json({ success: true, message: 'Mock daily report email sent' });
@@ -326,7 +317,7 @@ app.post('/daily-report', async (req, res) => {
   }
 });
 
-// ✅ Welcome Email (for testing)
+// ✅ Welcome Email (manual trigger for testing)
 app.post('/welcome', async (req, res) => {
   try {
     const { email, name } = req.body;
@@ -344,10 +335,12 @@ app.post('/welcome', async (req, res) => {
 
 // ✅ Cron Jobs
 cron.schedule('0 8 * * *', async () => {
+  console.log('⏰ Running daily report cron job');
   await sendDailyReport(supabase);
 });
 
 cron.schedule('0 12 * * *', async () => {
+  console.log('⏰ Running alert email cron job');
   await sendAlertEmail(supabase);
 });
 
