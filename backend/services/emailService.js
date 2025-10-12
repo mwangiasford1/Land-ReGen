@@ -34,30 +34,6 @@ export const sendAlertEmail = async (user, alertData) => {
 };
 
 // ✅ Daily Soil Health Report Email
-export const sendDailyReport = async (user, reportData) => {
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: user.email,
-    subject: `📊 Daily Soil Health Report - ${user.preferred_zone}`,
-    html: `
-      <h2>Daily Soil Health Report</h2>
-      <p>Hello ${user.name},</p>
-      <p>Here's your daily report for <strong>${user.preferred_zone}</strong>:</p>
-      <h3>Key Metrics</h3>
-      <ul>
-        <li>Average Vegetation Index: ${reportData.avgVegetation}</li>
-        <li>Average Erosion Index: ${reportData.avgErosion}</li>
-        <li>Average Moisture Level: ${reportData.avgMoisture}%</li>
-      </ul>
-      <h3>AI Recommendations</h3>
-      <p>${reportData.recommendations}</p>
-    `
-  };
-
-  await transporter.sendMail(mailOptions);
-};
-
-// ✅ Password Reset Email
 export const sendResetEmail = async (recipient, resetUrl) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
@@ -72,5 +48,10 @@ export const sendResetEmail = async (recipient, resetUrl) => {
     `
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`✅ Reset email sent to ${recipient}`);
+  } catch (error) {
+    console.error(`❌ Failed to send reset email:`, error.message);
+  }
 };

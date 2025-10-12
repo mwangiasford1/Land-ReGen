@@ -35,6 +35,9 @@ app.use(cors({
   credentials: true
 }));
 
+// Trust first proxy if behind one (e.g., Heroku, Vercel)
+app.set('trust proxy', 1);
+
 // ✅ Global OPTIONS handler
 app.options('*', (req, res) => {
   const origin = req.headers.origin;
