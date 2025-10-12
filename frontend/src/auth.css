@@ -81,6 +81,7 @@
   max-width: var(--container-max);
   backdrop-filter: blur(10px);
   border: 1px solid var(--border);
+  margin-left: -50px; /* slight offset for neon wrapper */
 }
 
 .auth-form h2 {
