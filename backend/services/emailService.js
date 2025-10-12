@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 
+// ✅ Create transporter
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: process.env.EMAIL_PORT,
@@ -10,6 +11,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// ✅ Soil Health Alert Email
 export const sendAlertEmail = async (user, alertData) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
@@ -27,10 +29,11 @@ export const sendAlertEmail = async (user, alertData) => {
       <p>Please review the dashboard for detailed analysis.</p>
     `
   };
-  
+
   await transporter.sendMail(mailOptions);
 };
 
+// ✅ Daily Soil Health Report Email
 export const sendDailyReport = async (user, reportData) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
@@ -50,6 +53,24 @@ export const sendDailyReport = async (user, reportData) => {
       <p>${reportData.recommendations}</p>
     `
   };
-  
+
+  await transporter.sendMail(mailOptions);
+};
+
+// ✅ Password Reset Email
+export const sendResetEmail = async (recipient, resetUrl) => {
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: recipient,
+    subject: '🔐 Reset Your Land ReGen Password',
+    html: `
+      <h2>Password Reset Request</h2>
+      <p>Hello,</p>
+      <p>You requested a password reset. Click the link below to reset your password:</p>
+      <p><a href="${resetUrl}">${resetUrl}</a></p>
+      <p>This link will expire in 1 hour.</p>
+    `
+  };
+
   await transporter.sendMail(mailOptions);
 };
