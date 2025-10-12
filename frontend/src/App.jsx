@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react'
-import Dashboard from './pages/Dashboard'
-import Login from './auth/Login'
-import Register from './auth/Register'
-import ForgotPassword from './auth/ForgotPassword'
-import ResetPassword from './auth/ResetPassword'
-import SplashScreen from './components/SplashScreen'
-import { SettingsProvider } from './contexts/SettingsContext'
-import { validateToken } from './utils/security'
-import './App.css'
-import './auth.css'
+import React, { useState, useEffect } from 'react';
+import Dashboard from './pages/Dashboard';
+import Login from './auth/Login';
+import Register from './auth/Register';
+import ForgotPassword from './auth/ForgotPassword';
+import ResetPassword from './auth/ResetPassword';
+import SplashScreen from './components/SplashScreen';
+import { SettingsProvider } from './contexts/SettingsContext';
+import { validateToken } from './utils/security';
+import './App.css';
+import './auth.css';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -19,26 +19,26 @@ function App() {
   const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
-    // Check for reset token in URL
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
-    
+
     if (token) {
       setResetToken(token);
       setShowSplash(false);
       setLoading(false);
       return;
     }
-    
+
     const authToken = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
-    
+
     if (authToken && userData && validateToken(authToken)) {
       setUser(JSON.parse(userData));
     } else if (authToken) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
     }
+
     setLoading(false);
   }, []);
 
@@ -47,8 +47,7 @@ function App() {
   };
 
   const handleRegister = () => {
-    // Registration success will reload page to show login
-    setShowRegister(false);
+    setShowRegister(false); // Return to login after successful registration
   };
 
   const handleLogout = () => {
@@ -67,19 +66,21 @@ function App() {
 
   if (!user) {
     let authContent;
-    
+
     if (resetToken) {
       authContent = (
-        <ResetPassword 
-          token={resetToken} 
+        <ResetPassword
+          token={resetToken}
           onComplete={() => {
             setResetToken(null);
             window.history.replaceState({}, '', '/');
-          }} 
+          }}
         />
       );
     } else if (showForgotPassword) {
-      authContent = <ForgotPassword onBack={() => setShowForgotPassword(false)} />;
+      authContent = (
+        <ForgotPassword onBack={() => setShowForgotPassword(false)} />
+      );
     } else if (showRegister) {
       authContent = (
         <>
@@ -95,9 +96,10 @@ function App() {
     } else {
       authContent = (
         <>
-          <Login 
-            onLogin={handleLogin} 
+          <Login
+            onLogin={handleLogin}
             onForgotPassword={() => setShowForgotPassword(true)}
+            onCreateAccount={() => setShowRegister(true)} // ✅ This line enables the button
           />
           <div className="auth-toggle">
             <p>
@@ -108,14 +110,12 @@ function App() {
         </>
       );
     }
-    
+
     return (
       <div className="App">
         <div className="auth-container">
           <div className="wrapper">
-            <div className="login-box">
-              {authContent}
-            </div>
+            <div className="login-box">{authContent}</div>
           </div>
         </div>
       </div>
@@ -129,4 +129,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
