@@ -10,7 +10,7 @@
 :root {
   /* Brand & accent */
   --brand-1: #2e7d32; /* primary green */
-  --brand-2: #1b5e20; /* deeper green */
+  --brand-2: #2e7d32; /* deeper green */
   --accent: #00e5ff;  /* neon cyan */
   --accent-strong: #00c6ff;
 
@@ -81,7 +81,7 @@
   max-width: var(--container-max);
   backdrop-filter: blur(10px);
   border: 1px solid var(--border);
-  margin-left: -50px; /* slight offset for neon wrapper */
+  margin-right: 50px; /* slight offset for neon wrapper */
 }
 
 .auth-form h2 {
