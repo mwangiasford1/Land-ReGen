@@ -63,16 +63,19 @@ const Login = ({ onLogin, onForgotPassword }) => {
         value={formData.email}
         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
         required
+        autoComplete="email"
+        inputMode="email"
       />
 
       <input
-        className="login-box"
         type="password"
         aria-label="Password"
         placeholder="Enter your password"
         value={formData.password}
         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
         required
+        minLength={6}
+        autoComplete="current-password"
       />
 
       <button type="submit" disabled={loading}>

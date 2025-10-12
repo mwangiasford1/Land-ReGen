@@ -112,7 +112,11 @@ function App() {
     return (
       <div className="App">
         <div className="auth-container">
-          {authContent}
+          <div className="wrapper">
+            <div className="login-box">
+              {authContent}
+            </div>
+          </div>
         </div>
       </div>
     );

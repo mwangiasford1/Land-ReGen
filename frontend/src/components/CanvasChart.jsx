@@ -235,33 +235,15 @@ const CanvasChart = ({ data, zones = ['Murang\'a'], type = 'realtime' }) => {
 
   return (
     <div className="canvas-chart">
-      <div className="chart-controls" style={{
-        marginBottom: '10px',
-        display: 'flex',
-        flexDirection: window.innerWidth < 768 ? 'column' : 'row',
-        alignItems: window.innerWidth < 768 ? 'stretch' : 'center',
-        gap: '8px'
-      }}>
-        <button 
+      <div className="chart-controls">
+        <button
           onClick={toggleAnimation}
-          style={{
-            padding: '8px 16px',
-            background: isAnimating ? '#f44336' : '#4CAF50',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            fontSize: window.innerWidth < 768 ? '14px' : '16px',
-            width: window.innerWidth < 768 ? '100%' : 'auto'
-          }}
+          className={`chart-toggle-btn ${isAnimating ? 'pause' : 'play'}`}
+          aria-label={isAnimating ? 'Pause animation' : 'Start animation'}
         >
           {isAnimating ? '⏸️ Pause' : '▶️ Play'}
         </button>
-        <span style={{
-          fontSize: window.innerWidth < 768 ? '11px' : '12px',
-          color: '#666',
-          textAlign: window.innerWidth < 768 ? 'center' : 'left'
-        }}>
+        <span className="chart-info">
           {type === 'realtime' && 'Live moisture'}
           {type === 'multizone' && `${zones.length} zones`}
           {type === 'density' && `${data?.length || 0} points`}
@@ -272,29 +254,14 @@ const CanvasChart = ({ data, zones = ['Murang\'a'], type = 'realtime' }) => {
         ref={canvasRef}
         width={dimensions.width}
         height={dimensions.height}
-        style={{
-          border: '1px solid #e2e8f0',
-          borderRadius: '8px',
-          background: '#ffffff',
-          width: '100%',
-          maxWidth: '100%',
-          height: 'auto',
-          touchAction: 'manipulation',
-          display: 'block'
-        }}
+        className="chart-canvas"
+        aria-label="Soil metrics visualization"
       />
       
-      <div className="chart-legend" style={{
-        marginTop: '10px',
-        fontSize: window.innerWidth < 768 ? '11px' : '12px',
-        display: 'flex',
-        justifyContent: 'space-around',
-        flexWrap: 'wrap',
-        gap: '5px'
-      }}>
-        <span style={{color: '#4CAF50'}}>🟢 Vegetation</span>
-        <span style={{color: '#f44336'}}>🔴 Erosion</span>
-        <span style={{color: '#2196F3'}}>🔵 Moisture</span>
+      <div className="chart-legend">
+        <span className="legend-item"><span className="legend-color status-good"></span> Vegetation</span>
+        <span className="legend-item"><span className="legend-color status-critical"></span> Erosion</span>
+        <span className="legend-item"><span className="legend-color status-warning"></span> Moisture</span>
       </div>
     </div>
   );

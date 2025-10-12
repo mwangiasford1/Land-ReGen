@@ -134,7 +134,8 @@ const LineChart = ({ data, location, dateRange }) => {
         ref={canvasRef} 
         width={800} 
         height={400}
-        style={{ maxWidth: '100%', height: 'auto' }}
+        className="chart-canvas"
+        aria-label="Soil health trends"
       />
     </div>
   );

@@ -119,9 +119,18 @@ useEffect(() => {
       case 'analytics':
         return (
           <div className="analytics-section">
-            <CanvasChart data={data} zones={[selectedZone]} type="realtime" />
-            <CanvasChart data={Object.values(allZoneData).flat()} zones={[selectedZone, 'Kiambu']} type="multizone" />
-            <CanvasChart data={data} zones={[selectedZone]} type="density" />
+            <div className="chart-tile">
+              <h3>Realtime Moisture</h3>
+              <CanvasChart data={data} zones={[selectedZone]} type="realtime" />
+            </div>
+            <div className="chart-tile">
+              <h3>Multi-zone Overview</h3>
+              <CanvasChart data={Object.values(allZoneData).flat()} zones={[selectedZone, 'Kiambu']} type="multizone" />
+            </div>
+            <div className="chart-tile">
+              <h3>High-density View</h3>
+              <CanvasChart data={data} zones={[selectedZone]} type="density" />
+            </div>
           </div>
         );
       case 'voice':
@@ -211,7 +220,7 @@ useEffect(() => {
               <h1>🌱 Land ReGen Dashboard</h1>
               <h2>{selectedZone} Soil Health Monitoring</h2>
               <p>Welcome, {user?.name} ({user?.role})</p>
-              <p style={{ fontSize: '0.9rem', opacity: '0.8' }}>
+              <p>
                 {new Date(dateRange.start).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} - 
                 {new Date(dateRange.end).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
               </p>
