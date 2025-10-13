@@ -15,21 +15,21 @@ const transporter = nodemailer.createTransport({
   connectionTimeout: 15000, // ⏱️ Increased timeout
 });
 
-// ✅ Generic retry wrapper
+// ✅ Generic retry wrapper with SMTP response logging
 const sendWithRetry = async (mailOptions, label) => {
-  try {
-    await transporter.sendMail(mailOptions);
-    console.log(`✅ ${label} email sent to ${mailOptions.to}`);
-  } catch (err) {
-    console.error(`❌ First attempt failed: ${err.message}`);
-    await new Promise((res) => setTimeout(res, 3000));
+  for (let attempt = 1; attempt <= 2; attempt++) {
     try {
-      await transporter.sendMail(mailOptions);
-      console.log(`✅ ${label} email sent to ${mailOptions.to} after retry`);
-    } catch (retryErr) {
-      console.error(`❌ Retry failed: ${retryErr.message}`);
+      const info = await transporter.sendMail(mailOptions);
+      console.log(`✅ ${label} email sent to ${mailOptions.to} on attempt ${attempt}`);
+      console.log(`📨 SMTP response: ${info.response}`);
+      return;
+    } catch (err) {
+      console.error(`❌ Attempt ${attempt} failed: ${err.message}`);
+      if (attempt < 2) await new Promise((res) => setTimeout(res, 3000));
     }
   }
+
+  console.warn(`⚠️ All attempts failed for ${label} email to ${mailOptions.to}`);
 };
 
 // ✅ Soil Health Alert Email
