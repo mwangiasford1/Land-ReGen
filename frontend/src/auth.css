@@ -1,25 +1,26 @@
 /*
-  Auth UI — Polished Professional Styles
-  - Design tokens via CSS variables
+  Auth UI — Clean and Accessible
+  - Removed dark green page background
+  - White login card with subtle shadow
   - Accessible focus rings and clear states
-  - Subtle motion (prefers-reduced-motion respected)
   - Light/Dark scheme support
-  - Scoped neon wrapper to avoid conflicts
+  - Optional neon wrapper preserved and fixed
 */
 
+/* Design tokens */
 :root {
   /* Brand & accent */
   --brand-1: #12dd1c; /* primary green */
-  --brand-2: #191b19; /* deeper green */
+  --brand-2: #0f6a12; /* deeper green */
   --accent: #00e5ff;  /* neon cyan */
   --accent-strong: #00c6ff;
 
   /* Surfaces & text */
   --surface: #ffffff;
-  --surface-veil: rgba(255, 255, 255, 0.92);
-  --text-primary: #1f2937; /* slate-800 */
-  --text-secondary: #6b7280; /* slate-500 */
-  --border: rgba(17, 24, 39, 0.12); /* slate-900 @12% */
+  --surface-veil: rgba(255, 255, 255, 0.96);
+  --text-primary: #111827;   /* gray-900 */
+  --text-secondary: #6b7280; /* gray-500 */
+  --border: rgba(17, 24, 39, 0.12); /* gray-900 @12% */
 
   /* Feedback */
   --error: #dc2626;      /* red-600 */
@@ -36,14 +37,17 @@
   --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.18);
 
   /* Sizing */
-  --container-max: 450px;
+  --container-max: 480px;
+
+  /* Focus ring */
+  --focus: rgba(0, 199, 255, 0.35);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --surface: #0f172a; /* slate-900 */
-    --surface-veil: rgba(15, 23, 42, 0.86);
-    --text-primary: #e5e7eb; /* slate-200 */
+    --surface: #0f172a;        /* slate-900 */
+    --surface-veil: rgba(15, 23, 42, 0.92);
+    --text-primary: #e5e7eb;   /* slate-200 */
     --text-secondary: #94a3b8; /* slate-400 */
     --border: rgba(255, 255, 255, 0.14);
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
@@ -52,36 +56,54 @@
   }
 }
 
-/* Container */
+/* Container — no dark green background */
 .auth-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
   min-height: 100vh;
-  width: 100vw;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--brand-1) 70%, #4caf50), var(--brand-2));
+  width: 100%;
   padding: clamp(1rem, 3vw, 2rem);
   box-sizing: border-box;
+
   position: fixed;
   inset: 0;
   z-index: 1000;
+
+  background: transparent !important;   /* Remove green backdrop */
+  background-image: none !important;
 }
 
-/* Core form card */
+/* In case any pseudo-element backgrounds were used previously */
+.auth-container::before,
+.auth-container::after {
+  content: none !important;
+  background: none !important;
+}
+
+/* Core reusable auth form card (used by Register/Forgot/etc.) */
 .auth-form {
   display: flex;
   flex-direction: column;
   gap: 0.875rem;
-  background: var(--surface-veil);
+
+  background: var(--surface);
+  color: var(--text-primary);
+
   padding: clamp(1.5rem, 2.5vw, 2.25rem);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   width: 100%;
   max-width: var(--container-max);
-  backdrop-filter: blur(10px);
   border: 1px solid var(--border);
-  margin-right: 1000px; /* slight offset for neon wrapper */
+
+  -webkit-backdrop-filter: saturate(120%) blur(6px);
+  backdrop-filter: saturate(120%) blur(6px);
+
+  /* Remove erroneous offset */
+  margin: 0;
 }
 
 .auth-form h2 {
@@ -115,19 +137,19 @@
 
 .auth-form input::placeholder,
 .auth-form select::placeholder {
-  color: color-mix(in srgb, var(--text-secondary) 80%, transparent);
+  color: rgba(107, 114, 128, 0.8); /* gray-500 @80% */
 }
 
 .auth-form input:focus,
 .auth-form select:focus {
-  border-color: color-mix(in srgb, var(--accent) 70%, #00bcd4);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 20%, transparent);
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 4px var(--focus);
 }
 
 .auth-form input:disabled,
 .auth-form select:disabled {
-  background: color-mix(in srgb, var(--surface) 92%, #e5e7eb);
-  color: color-mix(in srgb, var(--text-secondary) 70%, #9ca3af);
+  background: #f3f4f6; /* gray-100 */
+  color: #9ca3af;      /* gray-400 */
   cursor: not-allowed;
 }
 
@@ -164,17 +186,17 @@
   box-shadow: none;
 }
 
-/* Toggle line below forms */
+/* Toggle line under forms */
 .auth-toggle {
   text-align: center;
   margin-top: 1rem;
-  color: #fff;
+  color: var(--text-secondary);
 }
 
 .auth-toggle button {
   background: none;
   border: none;
-  color: color-mix(in srgb, #ffffff 88%, var(--accent-strong));
+  color: var(--accent-strong);
   text-decoration: underline;
   cursor: pointer;
   font-size: 16px;
@@ -192,7 +214,7 @@
   color: var(--error);
   padding: 10px 12px;
   border-radius: var(--radius-sm);
-  border: 1px solid color-mix(in srgb, var(--error) 15%, #ffffff);
+  border: 1px solid rgba(220, 38, 38, 0.15);
 }
 
 .success {
@@ -200,115 +222,18 @@
   color: var(--success);
   padding: 10px 12px;
   border-radius: var(--radius-sm);
-  border: 1px solid color-mix(in srgb, var(--success) 15%, #ffffff);
+  border: 1px solid rgba(22, 163, 74, 0.15);
   text-align: center;
 }
 
-/* App-specific panels (kept, but harmonized) */
-.testimonial-form,
-.user-settings,
-.email-tester {
-  background: color-mix(in srgb, var(--surface-veil) 85%, transparent);
-  backdrop-filter: blur(30px);
-  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
-  padding: 2rem;
-  border-radius: var(--radius-lg);
-  margin: 1rem 0;
-  box-shadow: var(--shadow-md);
-}
-
-.testimonial-list { margin: 1rem 0; }
-
-.testimonial-card {
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
-  backdrop-filter: blur(20px);
-  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
-  padding: 1.25rem;
-  border-radius: 14px;
-  margin-bottom: 1rem;
-  border-left: 4px solid var(--brand-1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.testimonial-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.setting-group { margin-bottom: 1rem; }
-.setting-group label { display: flex; align-items: center; gap: 0.5rem; }
-
-.test-section {
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-}
-
-.test-section h4 { margin: 0 0 0.5rem 0; color: var(--text-primary); }
-
-.test-section button {
-  background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
-  color: #fff;
-  border: none;
-  padding: 12px 20px;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  margin-top: 12px;
-  font-weight: 700;
-  transition: transform 0.12s ease, box-shadow 0.2s ease, filter 0.2s ease;
-  box-shadow: var(--shadow-sm);
-}
-
-.test-section button:hover {
-  transform: translateY(-1px) scale(1.01);
-  box-shadow: var(--shadow-md);
-}
-
-.test-section button:disabled {
-  background: #c7cdd1;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-.result { margin-top: 10px; padding: 10px; border-radius: var(--radius-sm); }
-.result.success { background: var(--success-bg); color: var(--success); }
-.result.error { background: var(--error-bg); color: var(--error); }
-
-.email-config {
-  background: color-mix(in srgb, var(--surface) 95%, transparent);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  margin-top: 1rem;
-  border: 1px solid var(--border);
-}
-
-.logout-btn {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  color: #fff;
-  padding: 12px 16px;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 700;
-  transition: transform 0.12s ease, box-shadow 0.2s ease;
-  border: 1px solid color-mix(in srgb, #ffffff 20%, #000000 10%);
-  box-shadow: var(--shadow-sm);
-}
-
-.logout-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-/* Scoped Neon Login Wrapper (non-breaking) */
+/* Neon Login Wrapper (optional aesthetic; no green background) */
 .auth-container .wrapper {
   position: relative;
   width: min(760px, 92vw);
   background: transparent;
   border: 1.5px solid var(--accent);
   overflow: hidden;
-  box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 50%, transparent);
+  box-shadow: 0 0 18px rgba(0, 229, 255, 0.5);
   border-radius: 15px;
   display: flex;
   align-items: center;
@@ -318,73 +243,91 @@
   animation: glow 3.2s ease-in-out infinite;
 }
 
+/* White login card */
 .auth-container .wrapper .login-box {
   width: 100%;
   max-width: 420px;
   padding: clamp(28px, 3.2vw, 40px);
-  background: color-mix(in srgb, #000 65%, transparent);
+  background: var(--surface);
+  color: var(--text-primary);
   border-radius: 12px;
-  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 30%, transparent);
-  color: #fff;
-  
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.3);
+  border: 1px solid var(--border);
+  -webkit-backdrop-filter: saturate(120%) blur(6px);
+  backdrop-filter: saturate(120%) blur(6px);
 }
 
-.auth-container wrapper .login-box h2 {
+/* Fixed selector (added missing dot before wrapper) */
+.auth-container .wrapper .login-box h2 {
   text-align: center;
   margin: 0 0 24px 0;
   font-size: clamp(22px, 2.2vw, 28px);
-  color: var(--accent);
+  color: var(--text-primary);
   letter-spacing: 0.3px;
 }
 
+/* Inputs inside login box */
 .auth-container .wrapper .login-box input[type="text"],
 .auth-container .wrapper .login-box input[type="email"],
 .auth-container .wrapper .login-box input[type="password"] {
   width: 100%;
   padding: 12px 16px;
   margin: 10px 0;
-  border: none;
-  border-bottom: 2px solid color-mix(in srgb, var(--accent) 70%, #00bcd4);
-  background: transparent;
-  color: #ffffff;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
   font-size: 16px;
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .auth-container .wrapper .login-box input:focus {
-  border-bottom-color: var(--accent-strong);
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 4px var(--focus);
 }
 
+/* Buttons inside login box */
 .auth-container .wrapper .login-box button {
   width: 100%;
   padding: 12px 14px;
-  background: var(--accent);
+  background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
   border: none;
   border-radius: 6px;
-  color: #000;
+  color: #fff;
   font-weight: 800;
   font-size: 16px;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.2s ease, filter 0.2s ease;
   margin-top: 8px;
+  box-shadow: var(--shadow-md);
 }
 
-.auth-container .wrapper .login-box button:hover {
-  background: var(--accent-strong);
+.auth-container .wrapper .login-box button:hover:not(:disabled) {
   transform: translateY(-1px);
+  filter: brightness(1.02);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.2);
 }
 
+.auth-container .wrapper .login-box button:disabled {
+  background: #c7cdd1;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Neon glow animation */
 @keyframes glow {
-  0%   { box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 40%, transparent); }
-  50%  { box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 70%, transparent); }
-  100% { box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 40%, transparent); }
+  0%   { box-shadow: 0 0 8px rgba(0, 229, 255, 0.4); }
+  50%  { box-shadow: 0 0 22px rgba(0, 229, 255, 0.7); }
+  100% { box-shadow: 0 0 8px rgba(0, 229, 255, 0.4); }
 }
 
-/* Responsive */
+/* Responsive adjustments */
 @media (max-width: 640px) {
   .auth-form { padding: 1.25rem; border-radius: 14px; }
   .auth-form button { padding: 12px 14px; }
+  .auth-container .wrapper { width: min(640px, 96vw); padding: 14px; }
+  .auth-container .wrapper .login-box { padding: clamp(22px, 3vw, 32px); }
 }
 
 @media (max-width: 380px) {
@@ -393,5 +336,8 @@
 
 /* Motion safety */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation: none !important; transition: none !important; }
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }
