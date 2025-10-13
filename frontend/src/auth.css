@@ -9,7 +9,7 @@
 
 :root {
   /* Brand & accent */
-  --brand-1: #12dd1c; /* primary green */
+  --brand-1: #2e7d32; /* primary green */
   --brand-2: #191b19; /* deeper green */
   --accent: #00e5ff;  /* neon cyan */
   --accent-strong: #00c6ff;
@@ -69,34 +69,7 @@
 }
 
 /* Core form card */
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.875rem;
-  background: var(--surface-veil);
-  padding: clamp(1.5rem, 2.5vw, 2.25rem);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  width: 100%;
-  max-width: var(--container-max);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--border);
-  margin-right: 1000px; /* slight offset for neon wrapper */
-}
 
-.auth-form h2 {
-  margin: 0 0 0.25rem 0;
-  text-align: center;
-  color: var(--text-primary);
-  font-weight: 700;
-  letter-spacing: 0.2px;
-}
-
-.auth-form p {
-  text-align: center;
-  color: var(--text-secondary);
-  margin: 0 0 0.75rem 0;
-}
 
 /* Inputs */
 .auth-form input,
