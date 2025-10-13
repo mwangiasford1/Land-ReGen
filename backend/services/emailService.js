@@ -7,12 +7,30 @@ const transporter = nodemailer.createTransport({
   secure: false, // TLS via STARTTLS
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    pass: process.env.EMAIL_PASS,
   },
   tls: {
-    rejectUnauthorized: false // Helps avoid handshake issues on Render
-  }
+    rejectUnauthorized: false, // Helps avoid handshake issues on Render
+  },
+  connectionTimeout: 15000, // ⏱️ Increased timeout
 });
+
+// ✅ Generic retry wrapper
+const sendWithRetry = async (mailOptions, label) => {
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`✅ ${label} email sent to ${mailOptions.to}`);
+  } catch (err) {
+    console.error(`❌ First attempt failed: ${err.message}`);
+    await new Promise((res) => setTimeout(res, 3000));
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log(`✅ ${label} email sent to ${mailOptions.to} after retry`);
+    } catch (retryErr) {
+      console.error(`❌ Retry failed: ${retryErr.message}`);
+    }
+  }
+};
 
 // ✅ Soil Health Alert Email
 export const sendAlertEmail = async (user, alertData) => {
@@ -30,15 +48,10 @@ export const sendAlertEmail = async (user, alertData) => {
         <li>Moisture Level: ${alertData.moisture_level}%</li>
       </ul>
       <p>Please review the dashboard for detailed analysis.</p>
-    `
+    `,
   };
 
-  try {
-    await transporter.sendMail(mailOptions);
-    console.log(`✅ Alert email sent to ${user.email}`);
-  } catch (error) {
-    console.error(`❌ Failed to send alert email:`, error.message);
-  }
+  await sendWithRetry(mailOptions, 'Alert');
 };
 
 // ✅ Daily Soil Health Report Email
@@ -58,15 +71,10 @@ export const sendDailyReport = async (user, reportData) => {
       </ul>
       <h3>AI Recommendations</h3>
       <p>${reportData.recommendations}</p>
-    `
+    `,
   };
 
-  try {
-    await transporter.sendMail(mailOptions);
-    console.log(`✅ Daily report sent to ${user.email}`);
-  } catch (error) {
-    console.error(`❌ Failed to send daily report:`, error.message);
-  }
+  await sendWithRetry(mailOptions, 'Daily Report');
 };
 
 // ✅ Password Reset Email
@@ -81,13 +89,8 @@ export const sendResetEmail = async (recipient, resetUrl) => {
       <p>You requested a password reset. Click the link below to reset your password:</p>
       <p><a href="${resetUrl}">${resetUrl}</a></p>
       <p>This link will expire in 1 hour.</p>
-    `
+    `,
   };
 
-  try {
-    await transporter.sendMail(mailOptions);
-    console.log(`✅ Reset email sent to ${recipient}`);
-  } catch (error) {
-    console.error(`❌ Failed to send reset email:`, error.message);
-  }
+  await sendWithRetry(mailOptions, 'Reset');
 };
