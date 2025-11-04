@@ -20,7 +20,6 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANO
 // ✅ CORS configuration
 const allowedOrigins = new Set([
   'https://land-regen-1.onrender.com',
-  'https://land-regen.onrender.com',
   'http://localhost:3001'
 ]);
 
