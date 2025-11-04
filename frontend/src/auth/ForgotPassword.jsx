@@ -21,11 +21,23 @@ const ForgotPassword = ({ onBack }) => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/forgot-password`, {
+      const url = `${API_BASE_URL}/forgot-password`;
+      if (!url.startsWith('http')) {
+        throw new Error('Invalid API URL');
+      }
+      
+      const response = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Origin': globalThis.location.origin
+        },
         body: JSON.stringify({ email })
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const data = await response.json();
       

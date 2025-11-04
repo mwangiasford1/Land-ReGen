@@ -15,15 +15,15 @@ const escapeHtml = (text) => {
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST || 'smtp.gmail.com',
   port: Number.parseInt(process.env.EMAIL_PORT, 10) || 587,
-  secure: false, // TLS via STARTTLS
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
   tls: {
-    rejectUnauthorized: false, // Helps avoid handshake issues on Render
+    rejectUnauthorized: false
   },
-  connectionTimeout: 15000, // ⏱️ Increased timeout
+  connectionTimeout: 15000
 });
 
 // ✅ Generic retry wrapper with SMTP response logging
@@ -91,15 +91,34 @@ export const sendDailyReport = async (user, reportData) => {
 // ✅ Password Reset Email
 export const sendResetEmail = async (recipient, resetUrl) => {
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: `"Land ReGen Support" <${process.env.EMAIL_USER}>`,
     to: recipient,
-    subject: 'Reset Your Land ReGen Password',
+    replyTo: process.env.EMAIL_USER,
+    subject: 'Password Reset - Land ReGen',
+    text: `Hello,\n\nYou requested a password reset for your Land ReGen account.\n\nReset your password: ${resetUrl}\n\nThis link expires in 1 hour.\n\nIf you didn't request this, please ignore this email.\n\nBest regards,\nLand ReGen Team`,
     html: `
-      <h2>Password Reset Request</h2>
-      <p>Hello,</p>
-      <p>You requested a password reset. Click the link below to reset your password:</p>
-      <p><a href="${escapeHtml(resetUrl)}">${escapeHtml(resetUrl)}</a></p>
-      <p>This link will expire in 1 hour.</p>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Password Reset</title>
+      </head>
+      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+          <h2 style="color: #2c5530; margin-bottom: 20px;">Password Reset Request</h2>
+          <p>Hello,</p>
+          <p>You requested a password reset for your Land ReGen account.</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${escapeHtml(resetUrl)}" style="background: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">Reset Password</a>
+          </div>
+          <p style="font-size: 14px; color: #666;">This link will expire in 1 hour.</p>
+          <p style="font-size: 14px; color: #666;">If you didn't request this password reset, please ignore this email.</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="font-size: 12px; color: #999;">Best regards,<br>Land ReGen Team</p>
+        </div>
+      </body>
+      </html>
     `,
   };
 
