@@ -9,24 +9,13 @@ export default defineConfig({
   },
   build: {
     target: 'esnext',
-    minify: 'terser',
+    minify: 'esbuild',
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom'],
-          charts: ['chart.js', 'react-chartjs-2'],
-          utils: ['lodash', 'date-fns']
+          vendor: ['react', 'react-dom']
         }
       }
-    },
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true
-      }
     }
-  },
-  optimizeDeps: {
-    include: ['react', 'react-dom']
   }
 })
