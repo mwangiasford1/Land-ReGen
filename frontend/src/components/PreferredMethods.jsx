@@ -82,7 +82,7 @@ const PreferredMethods = ({ data, location }) => {
             
             {showCosts && (
               <div className="method-cost">
-                💰 ${method.cost.min}-${method.cost.max} {method.cost.unit}
+                 ${method.cost.min}-${method.cost.max} {method.cost.unit}
               </div>
             )}
             

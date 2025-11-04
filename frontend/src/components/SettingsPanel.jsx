@@ -269,7 +269,7 @@ const SettingsPanel = () => {
       </div>
 
       <div className="setting-group">
-        <h4>🎛️ Dashboard Layout</h4>
+        <h4> Dashboard Layout</h4>
         <div className="checkbox-group">
           <label>
             <input 
@@ -308,7 +308,7 @@ const SettingsPanel = () => {
       </div>
 
       <div className="setting-group">
-        <h4>📄 Export Format</h4>
+        <h4> Export Format</h4>
         <select 
           value={settings.dataSync.exportFormat} 
           onChange={(e) => handleSettingChange('dataSync', 'exportFormat', e.target.value)}
@@ -327,7 +327,7 @@ const SettingsPanel = () => {
             window.location.reload();
           }}
         >
-          🔄 Manual Refresh
+           Manual Refresh
         </button>
         <button 
           className="action-btn"
@@ -336,7 +336,7 @@ const SettingsPanel = () => {
             alert('Cache cleared successfully!');
           }}
         >
-          🗑️ Clear Cache
+           Clear Cache
         </button>
       </div>
     </div>
@@ -345,7 +345,7 @@ const SettingsPanel = () => {
   const renderAITab = () => (
     <div className="settings-tab">
       <div className="setting-group">
-        <h4>🧠 AI Recommendations</h4>
+        <h4> AI Recommendations</h4>
         <div className="checkbox-group">
           <label>
             <input 
@@ -367,7 +367,7 @@ const SettingsPanel = () => {
       </div>
 
       <div className="setting-group">
-        <h4>🔧 Developer Tools</h4>
+        <h4> Developer Tools</h4>
         <div className="checkbox-group">
           <label>
             <input 

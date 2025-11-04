@@ -10,7 +10,7 @@ function ChartTile({ data }) {
 
   return (
     <div className="chart-tile">
-      <h3>📊 Trend Analysis</h3>
+      <h3> Trend Analysis</h3>
       <div className="chart-container">
         <svg width="100%" height="300" viewBox="0 0 600 300">
           {/* Grid lines */}

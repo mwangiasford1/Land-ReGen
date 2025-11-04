@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
@@ -17,14 +18,14 @@ const port = process.env.PORT || 3000;
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
 // ✅ CORS configuration
-const allowedOrigins = [
+const allowedOrigins = new Set([
   'https://land-regen-1.onrender.com',
   'http://localhost:3001'
-];
+]);
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.has(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -41,7 +42,7 @@ app.set('trust proxy', 1);
 // ✅ Global OPTIONS handler
 app.options('*', (req, res) => {
   const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
+  if (allowedOrigins.has(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
   }
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -50,12 +51,41 @@ app.options('*', (req, res) => {
   res.sendStatus(204);
 });
 
-app.use(helmet());
-app.use(express.json({ limit: '10mb' }));
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+}));
+app.use(compression());
+app.use(express.json({ limit: '1mb' }));
+
+// CSRF protection middleware
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (req.method !== 'GET' && !allowedOrigins.has(origin)) {
+    return res.status(403).json({ error: 'CSRF protection: Invalid origin' });
+  }
+  next();
+});
 
 // ✅ Rate limiting
-const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
-const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5 });
+const limiter = rateLimit({ 
+  windowMs: 15 * 60 * 1000, 
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false
+});
+const authLimiter = rateLimit({ 
+  windowMs: 15 * 60 * 1000, 
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false
+});
 
 app.use(limiter);
 app.use('/login', authLimiter);
@@ -64,7 +94,7 @@ app.use('/forgot-password', authLimiter);
 
 // ✅ Root route
 app.get('/', (req, res) => {
-  res.send('🌱 Land ReGen backend is running. Try /health or /register');
+  res.send('Land ReGen backend is running. Try /health or /register');
 });
 
 // ✅ Health check
@@ -125,6 +155,10 @@ app.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
 
+    if (!email) {
+      return res.status(400).json({ success: false, error: 'Email is required' });
+    }
+
     // 🔍 Check if user exists
     const { data: user, error: userError } = await supabase
       .from('users')
@@ -133,12 +167,13 @@ app.post('/forgot-password', async (req, res) => {
       .single();
 
     if (userError || !user) {
-      console.warn(`⚠️ Email not found: ${email}`);
-      return res.status(404).json({ success: false, error: 'Email not found' });
+      console.warn(`Email not found: ${email}`);
+      // Return success even if email not found for security
+      return res.json({ success: true, message: 'If the email exists, a reset link has been sent' });
     }
 
     // 🔐 Generate secure token and expiry
-    const crypto = await import('crypto');
+    const crypto = await import('node:crypto');
     const resetToken = crypto.randomBytes(32).toString('hex');
     const resetExpiry = new Date(Date.now() + 3600000); // 1 hour
 
@@ -152,22 +187,22 @@ app.post('/forgot-password', async (req, res) => {
       .eq('email', email);
 
     if (updateError) {
-      console.error(`❌ Failed to store reset token:`, updateError.message);
-      return res.status(500).json({ success: false, error: 'Failed to store reset token' });
+      console.error('Failed to store reset token:', updateError.message);
+      return res.status(500).json({ success: false, error: 'Failed to process request' });
     }
 
     // 📧 Construct reset URL and send email
-    const resetUrl = `https://land-regen-1.onrender.com/reset?token=${resetToken}`;
-    console.log(`📨 Reset token generated: ${resetToken}`);
-    console.log(`📧 Sending reset email to ${email} → ${resetUrl}`);
+    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3001'}?token=${resetToken}`;
+    console.log(`Reset token generated: ${resetToken}`);
+    console.log(`Sending reset email to ${email} -> ${resetUrl}`);
 
     await sendResetEmail(email, resetUrl);
-    console.log(`✅ Reset email sent to ${email}`);
+    console.log(`Reset email sent to ${email}`);
 
-    res.json({ success: true, message: 'Reset email sent' });
+    res.json({ success: true, message: 'If the email exists, a reset link has been sent' });
   } catch (error) {
-    console.error(`❌ Forgot password error:`, error.message);
-    res.status(500).json({ success: false, error: 'Internal server error' });
+    console.error('Forgot password error:', error.message);
+    res.status(500).json({ success: false, error: 'Failed to process request' });
   }
 });
 
@@ -176,26 +211,61 @@ app.post('/reset-password', async (req, res) => {
   try {
     const { token, password } = req.body;
 
-    const { data: user } = await supabase.from('users').select('*').eq('reset_token', token).single();
-    if (!user) return res.status(400).json({ success: false, error: 'Invalid or expired token' });
+    if (!token || !password) {
+      return res.status(400).json({ success: false, error: 'Token and password are required' });
+    }
+
+    if (password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password)) {
+      return res.status(400).json({ success: false, error: 'Password must be at least 8 characters with uppercase, lowercase, and number' });
+    }
+
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('reset_token', token)
+      .single();
+
+    if (userError || !user) {
+      return res.status(400).json({ success: false, error: 'Invalid or expired token' });
+    }
 
     if (new Date() > new Date(user.reset_expiry)) {
+      // Clear expired token
+      await supabase
+        .from('users')
+        .update({ reset_token: null, reset_expiry: null })
+        .eq('id', user.id);
       return res.status(400).json({ success: false, error: 'Token expired' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await supabase
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const { error: updateError } = await supabase
       .from('users')
-      .update({ password_hash: hashedPassword, reset_token: null, reset_expiry: null })
+      .update({ 
+        password_hash: hashedPassword, 
+        reset_token: null, 
+        reset_expiry: null 
+      })
       .eq('id', user.id);
 
+    if (updateError) {
+      console.error('Password update error:', updateError.message);
+      return res.status(500).json({ success: false, error: 'Failed to update password' });
+    }
+
+    console.log(`Password reset successful for user: ${user.email}`);
     res.json({ success: true, message: 'Password updated successfully' });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    console.error('Reset password error:', error.message);
+    res.status(500).json({ success: false, error: 'Failed to reset password' });
   }
 });
 
 // ✅ Soil Health
+// Cache for soil health data
+const cache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 app.get('/soil-health', authenticateToken, async (req, res) => {
   try {
     const { location, start, end } = req.query;
@@ -204,25 +274,38 @@ app.get('/soil-health', authenticateToken, async (req, res) => {
       return res.status(400).json({ success: false, error: 'Missing location or date range' });
     }
 
-    console.log('Incoming soil-health query:', { location, start, end });
+    // Check cache first
+    const cacheKey = `${location}-${start}-${end}`;
+    const cached = cache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      return res.json({ success: true, data: cached.data, cached: true });
+    }
 
     const { data, error } = await supabase
       .from('soil_health')
-      .select('*')
+      .select('id,location,timestamp,moisture_level,erosion_index,vegetation_index')
       .eq('location', location)
       .gte('timestamp', start)
       .lte('timestamp', end)
-      .order('timestamp', { ascending: true });
+      .order('timestamp', { ascending: true })
+      .limit(1000);
 
     if (error) {
-      console.error('Supabase query error:', error.message);
-      return res.status(500).json({ success: false, error: 'Database query failed: ' + error.message });
+      return res.status(500).json({ success: false, error: 'Database query failed' });
+    }
+
+    // Cache the result
+    cache.set(cacheKey, { data, timestamp: Date.now() });
+    
+    // Clean old cache entries
+    if (cache.size > 100) {
+      const oldestKey = cache.keys().next().value;
+      cache.delete(oldestKey);
     }
 
     res.json({ success: true, data });
   } catch (error) {
-    console.error('Soil Health Route Error:', error.message);
-    res.status(500).json({ success: false, error: 'Internal server error: ' + error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
 
@@ -322,7 +405,7 @@ app.put('/notifications/:id/read', authenticateToken, async (req, res) => {
 // ✅ Alert Email (for testing)
 app.post('/alert', async (req, res) => {
   try {
-    console.log('📨 Alert email test triggered from frontend');
+    console.log('Alert email test triggered from frontend');
 
     // Optional: mock zone or recipient for testing
     const mockZone = req.body.zone || 'Murang\'a';
@@ -342,7 +425,7 @@ app.post('/alert', async (req, res) => {
 app.post('/daily-report', async (req, res) => {
   try {
     const { zone, email } = req.body;
-    console.log(`📊 Daily report email triggered for ${zone} → ${email}`);
+    console.log(`Daily report email triggered for ${zone} -> ${email}`);
 
     // Replace with actual email logic
     // await sendDailyReportEmail(supabase, { zone, email });
@@ -358,7 +441,7 @@ app.post('/daily-report', async (req, res) => {
 app.post('/welcome', async (req, res) => {
   try {
     const { email, name } = req.body;
-    console.log(`🎉 Welcome email triggered for ${name} → ${email}`);
+    console.log(`Welcome email triggered for ${name} -> ${email}`);
 
     // Replace with actual email logic if ready
     // await sendWelcomeEmail({ email, name });
@@ -381,5 +464,5 @@ cron.schedule('0 12 * * *', async () => {
 
 // ✅ Start Server
 app.listen(port, () => {
-  console.log(`🚀 Land ReGen backend running on port ${port}`);
+  console.log(`Land ReGen backend running on port ${port}`);
 });

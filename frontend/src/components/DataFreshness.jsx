@@ -31,7 +31,7 @@ const DataFreshness = ({ lastUpdate, isLoading }) => {
           style={{ backgroundColor: freshness.color }}
         ></span>
         <span className="freshness-text">
-          {isLoading ? '🔄 Updating...' : `📡 ${freshness.text}`}
+          {isLoading ? ' Updating...' : ` ${freshness.text}`}
         </span>
       </div>
       {lastUpdate && (

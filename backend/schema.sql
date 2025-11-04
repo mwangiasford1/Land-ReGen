@@ -9,6 +9,8 @@ CREATE TABLE users (
   preferred_zone VARCHAR(100) DEFAULT 'Murang''a',
   email_notifications BOOLEAN DEFAULT true,
   daily_reports BOOLEAN DEFAULT true,
+  reset_token VARCHAR(255),
+  reset_expiry TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

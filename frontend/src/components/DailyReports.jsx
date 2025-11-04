@@ -30,7 +30,7 @@ const DailyReports = ({ user }) => {
 
   return (
     <div className="daily-reports">
-      <h3>📊 Daily Reports</h3>
+      <h3> Daily Reports</h3>
       {reports.length === 0 ? (
         <p>No reports available yet.</p>
       ) : (

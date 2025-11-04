@@ -18,7 +18,7 @@ const AlertHistory = ({ alerts }) => {
   return (
     <div className="alert-history">
       <div className="history-header" onClick={() => setIsExpanded(!isExpanded)}>
-        <h4>📋 Alert History ({alerts.length})</h4>
+        <h4> Alert History ({alerts.length})</h4>
         <span className="expand-icon">{isExpanded ? '▼' : '▶'}</span>
       </div>
       
@@ -39,7 +39,7 @@ const AlertHistory = ({ alerts }) => {
             </div>
           )) : (
             <div className="no-history">
-              📊 No alert history available
+               No alert history available
             </div>
           )}
         </div>

@@ -32,9 +32,15 @@ function App() {
     const authToken = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
 
-    if (authToken && userData && validateToken(authToken)) {
-      setUser(JSON.parse(userData));
-    } else if (authToken) {
+    try {
+      if (authToken && userData && validateToken(authToken)) {
+        setUser(JSON.parse(userData));
+      } else if (authToken) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
+    } catch (error) {
+      console.error('Error validating stored credentials:', error);
       localStorage.removeItem('token');
       localStorage.removeItem('user');
     }

@@ -4,10 +4,14 @@ const LineChart = ({ data, location, dateRange }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    if (!data || data.length === 0) return;
+    try {
+      if (!data || data.length === 0) return;
 
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
     const { width, height } = canvas;
 
     // Clear canvas
@@ -124,12 +128,14 @@ const LineChart = ({ data, location, dateRange }) => {
       ctx.fillStyle = '#2d3748';
       ctx.fillText(metric.label, width - 130, legendY + 12);
     });
-
-  }, [data]);
+    } catch (error) {
+      console.error('Chart rendering error:', error);
+    }
+  }, [data, location, dateRange]);
 
   return (
     <div className="line-chart">
-      <h3>📈 Soil Health Trends - {location}</h3>
+      <h3> Soil Health Trends - {location}</h3>
       <canvas 
         ref={canvasRef} 
         width={800} 

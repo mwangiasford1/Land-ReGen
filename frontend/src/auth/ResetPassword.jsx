@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import API_BASE_URL from '../config/api';
 
 const ResetPassword = ({ token, onComplete }) => {
@@ -17,19 +18,36 @@ const ResetPassword = ({ token, onComplete }) => {
       return;
     }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters');
+      return;
+    }
+
+    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+      setError('Password must contain uppercase, lowercase, and number');
       return;
     }
 
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/reset-password`, {
+      const url = `${API_BASE_URL}/reset-password`;
+      if (!url.startsWith('http')) {
+        throw new Error('Invalid API URL');
+      }
+      
+      const response = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Origin': globalThis.location.origin
+        },
         body: JSON.stringify({ token, password })
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const data = await response.json();
       
@@ -49,7 +67,7 @@ const ResetPassword = ({ token, onComplete }) => {
   if (success) {
     return (
       <form className="auth-form">
-        <h2>✅ Password Reset</h2>
+        <h2>Password Reset</h2>
         <div className="success">
           Password successfully reset! Redirecting to login...
         </div>
@@ -59,7 +77,7 @@ const ResetPassword = ({ token, onComplete }) => {
 
   return (
     <form onSubmit={handleSubmit} className="auth-form">
-      <h2>🔐 New Password</h2>
+      <h2>New Password</h2>
       <p style={{textAlign: 'center', color: '#666', marginBottom: '1.5rem'}}>
         Enter your new password
       </p>
@@ -72,7 +90,7 @@ const ResetPassword = ({ token, onComplete }) => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
-        minLength="6"
+        minLength="8"
       />
       
       <input
@@ -81,14 +99,19 @@ const ResetPassword = ({ token, onComplete }) => {
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
         required
-        minLength="6"
+        minLength="8"
       />
       
       <button type="submit" disabled={loading}>
-        {loading ? '🔄 Updating...' : '🔒 Update Password'}
+        {loading ? 'Updating...' : 'Update Password'}
       </button>
     </form>
   );
+};
+
+ResetPassword.propTypes = {
+  token: PropTypes.string.isRequired,
+  onComplete: PropTypes.func.isRequired
 };
 
 export default ResetPassword;

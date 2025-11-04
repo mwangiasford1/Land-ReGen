@@ -1,3 +1,6 @@
 {
-    "codium.codeCompletion.enable": true
+    "codium.codeCompletion.enable": true,
+    "amazonQ.ignoredSecurityIssues": [
+        ""
+    ]
 }

@@ -2,12 +2,12 @@ import React from 'react';
 
 const Sidebar = ({ activeSection, onSectionChange }) => {
   const navItems = [
-    { id: 'dashboard', icon: '📊', label: 'Dashboard' },
-    { id: 'zones', icon: '🗺️', label: 'Zones' },
-    { id: 'analytics', icon: '📈', label: 'Analytics' },
-    { id: 'alerts', icon: '⚠️', label: 'Alerts' },
-    { id: 'voice', icon: '🎤', label: 'Voice' },
-    { id: 'settings', icon: '⚙️', label: 'Settings' }
+    { id: 'dashboard', icon: '', label: 'Dashboard' },
+    { id: 'zones', icon: '', label: 'Zones' },
+    { id: 'analytics', icon: '', label: 'Analytics' },
+    { id: 'alerts', icon: '', label: 'Alerts' },
+    { id: 'voice', icon: '', label: 'Voice' },
+    { id: 'settings', icon: '', label: 'Settings' }
   ];
 
   return (

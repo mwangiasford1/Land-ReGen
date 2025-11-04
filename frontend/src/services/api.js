@@ -8,10 +8,23 @@ export const fetchSoilHealth = async (
   end = '2025-10-03'
 ) => {
   try {
+    if (!location || !start || !end) {
+      throw new Error('Missing required parameters');
+    }
+    
     const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Authentication token not found');
+    }
+    
     const params = new URLSearchParams({ location, start, end });
+    const url = `${API_BASE_URL}/soil-health?${params}`;
+    
+    if (!url.startsWith('http')) {
+      throw new Error('Invalid API URL');
+    }
 
-    const response = await fetch(`${API_BASE_URL}/soil-health?${params}`, {
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -55,9 +68,21 @@ export const fetchSoilHealth = async (
 // ✅ POST new soil reading (protected route)
 export const postSoilReading = async (data) => {
   try {
+    if (!data || typeof data !== 'object') {
+      throw new Error('Invalid data provided');
+    }
+    
     const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Authentication token not found');
+    }
+    
+    const url = `${API_BASE_URL}/soil-health`;
+    if (!url.startsWith('http')) {
+      throw new Error('Invalid API URL');
+    }
 
-    const response = await fetch(`${API_BASE_URL}/soil-health`, {
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -82,7 +107,13 @@ export const postSoilReading = async (data) => {
 export const fetchTestimonials = async (zone = '') => {
   try {
     const params = zone ? `?zone=${encodeURIComponent(zone)}` : '';
-    const response = await fetch(`${API_BASE_URL}/testimonials${params}`, {
+    const url = `${API_BASE_URL}/testimonials${params}`;
+    
+    if (!url.startsWith('http')) {
+      throw new Error('Invalid API URL');
+    }
+    
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Accept': 'application/json'

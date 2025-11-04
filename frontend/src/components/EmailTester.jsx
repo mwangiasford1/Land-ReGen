@@ -38,11 +38,11 @@ const EmailTester = () => {
 
   return (
     <div className="email-tester">
-      <h3>📧 Email Service Tester</h3>
+      <h3> Email Service Tester</h3>
 
-      {/* 🚨 Alert Email */}
+      {/*  Alert Email */}
       <div className="test-section">
-        <h4>🚨 Alert Email Test</h4>
+        <h4> Alert Email Test</h4>
         <p>Tests soil health alert notifications</p>
         <button
           onClick={() => testEmail('alert', {
@@ -61,9 +61,9 @@ const EmailTester = () => {
         )}
       </div>
 
-      {/* 📊 Daily Report */}
+      {/*  Daily Report */}
       <div className="test-section">
-        <h4>📊 Daily Report Test</h4>
+        <h4> Daily Report Test</h4>
         <p>Tests daily soil health report emails</p>
         <button
           onClick={() => testEmail('daily-report', {
@@ -82,9 +82,9 @@ const EmailTester = () => {
         )}
       </div>
 
-      {/* 🎉 Welcome Email */}
+      {/*  Welcome Email */}
       <div className="test-section">
-        <h4>🎉 Welcome Email Test</h4>
+        <h4> Welcome Email Test</h4>
         <p>Tests new user welcome emails</p>
         <input
           type="email"
@@ -118,10 +118,10 @@ const EmailTester = () => {
 
       {/* ⚙️ Email Config Info */}
       <div className="email-config">
-        <h4>⚙️ Email Configuration</h4>
+        <h4> Email Configuration</h4>
         <p><strong>SMTP Host:</strong> smtp.gmail.com</p>
         <p><strong>Email User:</strong> {process.env.REACT_APP_EMAIL_USER || 'Configured in backend .env'}</p>
-        <p><strong>Status:</strong> 🟡 Check backend logs for delivery</p>
+        <p><strong>Status:</strong> Check backend logs for delivery</p>
       </div>
     </div>
   );

@@ -86,7 +86,7 @@ const Register = ({ onRegister }) => {
             {error && <div className="error">{error}</div>}
             {success && (
               <div className="success">
-                ✅ Account created successfully! Redirecting to login...
+                 Account created successfully! Redirecting to login...
               </div>
             )}
 
@@ -127,9 +127,9 @@ const Register = ({ onRegister }) => {
               onChange={(e) => setFormData({ ...formData, role: e.target.value })}
               aria-label="Select Role"
             >
-              <option value="Field Agent">👨🌾 Field Agent</option>
-              <option value="Analyst">📊 Analyst</option>
-              <option value="Admin">🔑 Admin</option>
+              <option value="Field Agent"> Field Agent</option>
+              <option value="Analyst"> Analyst</option>
+              <option value="Admin"> Admin</option>
             </select>
 
             <select
@@ -137,14 +137,14 @@ const Register = ({ onRegister }) => {
               onChange={(e) => setFormData({ ...formData, preferred_zone: e.target.value })}
               aria-label="Preferred Zone"
             >
-              <option value="Murang'a">🌿 Murang'a</option>
-              <option value="Kiambu">🌱 Kiambu</option>
-              <option value="Thika">🌾 Thika</option>
-              <option value="Nyeri">🌲 Nyeri</option>
+              <option value="Murang'a"> Murang'a</option>
+              <option value="Kiambu"> Kiambu</option>
+              <option value="Thika"> Thika</option>
+              <option value="Nyeri"> Nyeri</option>
             </select>
 
             <button type="submit" disabled={loading}>
-              {loading ? '🔄 Creating Account...' : '🎆 Create Account'}
+              {loading ? ' Creating Account...' : ' Create Account'}
             </button>
 
             <div className="auth-toggle">

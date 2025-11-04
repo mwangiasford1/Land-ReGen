@@ -1,30 +1,32 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense, memo } from 'react';
 import PropTypes from 'prop-types';
 import { fetchSoilHealth } from '../services/api';
 import { generateSummary } from '../services/summaryEngine';
 import { alertEngine } from '../services/alertEngine';
 import { calculateServiceMetrics, getDataFreshness } from '../services/serviceMonitor';
 import { useSettings } from '../contexts/SettingsContext';
-import LineChart from '../components/LineChart';
-import VoiceCommand from '../components/VoiceCommand';
-import KPITiles from '../components/KPITiles';
-import SummaryCard from '../components/SummaryCard';
-import ZoneSelector from '../components/ZoneSelector';
-import ZoneComparison from '../components/ZoneComparison';
-import AlertHistory from '../components/AlertHistory';
-import DataFreshness from '../components/DataFreshness';
-import ReportExporter from '../components/ReportExporter';
-import PreferredMethods from '../components/PreferredMethods';
-import SettingsPanel from '../components/SettingsPanel';
-import Sidebar from '../components/Sidebar';
-import TestimonialForm from '../components/TestimonialForm';
-import TestimonialList from '../components/TestimonialList';
-import UserSettings from '../components/UserSettings';
-import EmailTester from '../components/EmailTester';
-import CanvasChart from '../components/CanvasChart';
+
+// Lazy load components
+const LineChart = lazy(() => import('../components/LineChart'));
+const VoiceCommand = lazy(() => import('../components/VoiceCommand'));
+const KPITiles = lazy(() => import('../components/KPITiles'));
+const SummaryCard = lazy(() => import('../components/SummaryCard'));
+const ZoneSelector = lazy(() => import('../components/ZoneSelector'));
+const ZoneComparison = lazy(() => import('../components/ZoneComparison'));
+const AlertHistory = lazy(() => import('../components/AlertHistory'));
+const DataFreshness = lazy(() => import('../components/DataFreshness'));
+const ReportExporter = lazy(() => import('../components/ReportExporter'));
+const PreferredMethods = lazy(() => import('../components/PreferredMethods'));
+const SettingsPanel = lazy(() => import('../components/SettingsPanel'));
+const Sidebar = lazy(() => import('../components/Sidebar'));
+const TestimonialForm = lazy(() => import('../components/TestimonialForm'));
+const TestimonialList = lazy(() => import('../components/TestimonialList'));
+const UserSettings = lazy(() => import('../components/UserSettings'));
+const EmailTester = lazy(() => import('../components/EmailTester'));
+const CanvasChart = lazy(() => import('../components/CanvasChart'));
 
 
-export default function Dashboard({ user, onLogout }) {
+const Dashboard = memo(function Dashboard({ user, onLogout }) {
   const { settings, updateSettings } = useSettings();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -45,16 +47,12 @@ const dateRange = useMemo(() => ({
 
  
 const loadData = useCallback(async (location = selectedZone) => {
+  if (loading) return; // Prevent concurrent requests
   setLoading(true);
   try {
     const result = await fetchSoilHealth(location, dateRange.start, dateRange.end);
     if (result.success && result.data) {
       setData(result.data);
-      alertEngine.updateThresholds({
-        erosion_critical: settings.alertThresholds.erosion,
-        vegetation_low: settings.alertThresholds.vegetation,
-        moisture_low: settings.alertThresholds.moisture
-      });
       const metrics = calculateServiceMetrics(result.data, location);
       setServiceMetrics(prev => ({ ...prev, [location]: metrics }));
       setAllZoneData(prev => ({ ...prev, [location]: result.data }));
@@ -65,22 +63,22 @@ const loadData = useCallback(async (location = selectedZone) => {
   } finally {
     setLoading(false);
   }
-}, [selectedZone, dateRange, settings]);
+}, [selectedZone, dateRange.start, dateRange.end, loading]);
 
-  const handleZoneChange = (zone) => {
+  const handleZoneChange = useCallback((zone) => {
     setSelectedZone(zone);
     loadData(zone);
     if (settings.defaultZone !== zone) {
       updateSettings({ defaultZone: zone });
     }
-  };
+  }, [loadData, settings.defaultZone, updateSettings]);
 
-  const handleVoiceLocation = (location) => {
+  const handleVoiceLocation = useCallback((location) => {
     setSelectedZone(location);
     loadData(location);
-  };
+  }, [loadData]);
 
-  const handleSummaryRequest = (show, summary = null) => {
+  const handleSummaryRequest = useCallback((show, summary = null) => {
     if (summary) {
       setSummaryData(summary);
     } else if (show) {
@@ -88,7 +86,7 @@ const loadData = useCallback(async (location = selectedZone) => {
       setSummaryData(generatedSummary);
     }
     setShowSummary(show);
-  };
+  }, [data, selectedZone]);
 
   useEffect(() => {
   loadData();
@@ -146,7 +144,7 @@ useEffect(() => {
       case 'alerts':
         return (
           <div className="alerts-section">
-            <h3>🚨 Active Alerts ({alerts.length})</h3>
+            <h3> Active Alerts ({alerts.length})</h3>
             <div className="alert-list">
               {alerts.length > 0 ? alerts.map(alert => (
                 <div key={alert.id} className={`alert-item ${alert.type}`}>
@@ -158,12 +156,12 @@ useEffect(() => {
                   }}>×</button>
                 </div>
               )) : (
-                <div className="no-alerts">🟢 No active alerts - All systems healthy</div>
+                <div className="no-alerts">No active alerts - All systems healthy</div>
               )}
             </div>
             <AlertHistory alerts={alerts} />
             <div className="service-status">
-              <h4>📊 Service Status</h4>
+              <h4>Service Status</h4>
               {Object.entries(serviceMetrics).map(([zone, metrics]) => (
                 <div key={zone} className="service-item">
                   <span className="zone-name">{zone}</span>
@@ -212,37 +210,39 @@ useEffect(() => {
 
   return (
     <div className="app-layout">
-      <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-      <div className="main-container">
-        <header className="header">
-          <div className="header-content">
-            <div className="header-text">
-              <h1>🌱 Land ReGen Dashboard</h1>
-              <h2>{selectedZone} Soil Health Monitoring</h2>
-              <p>Welcome, {user?.name} ({user?.role})</p>
-              <p>
-                {new Date(dateRange.start).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} - 
-                {new Date(dateRange.end).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-              </p>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+        <div className="main-container">
+          <header className="header">
+            <div className="header-content">
+              <div className="header-text">
+                <h1>Land ReGen Dashboard</h1>
+                <h2>{selectedZone} Soil Health Monitoring</h2>
+                <p>Welcome, {user?.name} ({user?.role})</p>
+                <p>
+                  {new Date(dateRange.start).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} - 
+                  {new Date(dateRange.end).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                </p>
+              </div>
+              <button onClick={onLogout} className="logout-btn">Logout</button>
+              <DataFreshness lastUpdate={lastUpdate} isLoading={loading} />
             </div>
-            <button onClick={onLogout} className="logout-btn">Logout</button>
-            <DataFreshness lastUpdate={lastUpdate} isLoading={loading} />
+          </header>
+          <div className="main-content">
+            {renderContent()}
           </div>
-        </header>
-        <div className="main-content">
-          {renderContent()}
         </div>
-      </div>
-      <SummaryCard
-        data={summaryData || data}
-        location={selectedZone}
-        isVisible={showSummary}
-        onClose={() => setShowSummary(false)}
-        summaryData={summaryData}
-      />
+        <SummaryCard
+          data={summaryData || data}
+          location={selectedZone}
+          isVisible={showSummary}
+          onClose={() => setShowSummary(false)}
+          summaryData={summaryData}
+        />
+      </Suspense>
     </div>
   );
-}
+});
 
 Dashboard.propTypes = {
   user: PropTypes.shape({
@@ -251,3 +251,5 @@ Dashboard.propTypes = {
   }),
   onLogout: PropTypes.func
 };
+
+export default Dashboard;

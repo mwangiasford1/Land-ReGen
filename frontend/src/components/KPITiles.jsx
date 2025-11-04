@@ -78,7 +78,7 @@ const KPITiles = ({ data, location }) => {
 
   return (
     <div className="kpi-tiles">
-      <h3>📊 Key Performance Indicators</h3>
+      <h3>Key Performance Indicators</h3>
       <div className="kpi-grid">
         <KPICard
           title="Service Unavailability"

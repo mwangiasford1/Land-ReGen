@@ -12,20 +12,32 @@ const ZoneSelector = ({ selectedZone, onZoneChange, zones }) => {
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'active': return '🟢';
-      case 'maintenance': return '🟡';
-      case 'inactive': return '🔴';
-      default: return '⚪';
+      case 'active': return 'Active';
+      case 'maintenance': return 'Maintenance';
+      case 'inactive': return 'Inactive';
+      default: return 'Unknown';
     }
   };
 
   const handleZoneSelect = (zoneName) => {
-    onZoneChange(zoneName);
+    try {
+      if (!zoneName || typeof zoneName !== 'string') {
+        console.error('Invalid zone name provided');
+        return;
+      }
+      if (typeof onZoneChange !== 'function') {
+        console.error('onZoneChange is not a function');
+        return;
+      }
+      onZoneChange(zoneName);
+    } catch (error) {
+      console.error('Error selecting zone:', error);
+    }
   };
 
   return (
     <div className="zone-selector">
-      <h3>🗺️ Select Monitoring Zone</h3>
+      <h3>Select Monitoring Zone</h3>
       
       {/* Dropdown Selector */}
       <div className="zone-dropdown">
@@ -66,13 +78,13 @@ const ZoneSelector = ({ selectedZone, onZoneChange, zones }) => {
       {/* Map View Placeholder */}
       <div className="zone-map">
         <div className="map-placeholder">
-          <h4>📍 {selectedZone} Region</h4>
+          <h4>{selectedZone} Region</h4>
           <div className="map-visual">
             <div className="region-outline">
               <div className="monitoring-points">
-                <div className="point active">📡</div>
-                <div className="point active">📡</div>
-                <div className="point maintenance">📡</div>
+                <div className="point active">Station 1</div>
+                <div className="point active">Station 2</div>
+                <div className="point maintenance">Station 3</div>
               </div>
             </div>
           </div>

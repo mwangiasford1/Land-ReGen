@@ -241,7 +241,7 @@ const CanvasChart = ({ data, zones = ['Murang\'a'], type = 'realtime' }) => {
           className={`chart-toggle-btn ${isAnimating ? 'pause' : 'play'}`}
           aria-label={isAnimating ? 'Pause animation' : 'Start animation'}
         >
-          {isAnimating ? '⏸️ Pause' : '▶️ Play'}
+          {isAnimating ? '⏸ Pause' : '▶ Play'}
         </button>
         <span className="chart-info">
           {type === 'realtime' && 'Live moisture'}

@@ -68,7 +68,7 @@ const SummaryCard = ({ data, location, isVisible, onClose, summaryData }) => {
                   className="status-change"
                   style={{ color: summary.metrics.erosion.change < 0 ? '#4CAF50' : '#f44336' }}
                 >
-                  {summary.metrics.erosion.change > 0 ? '📈' : '📉'} {Math.abs(summary.metrics.erosion.change.toFixed(1))}%
+                  {summary.metrics.erosion.change > 0 ? '📈' : ''} {Math.abs(summary.metrics.erosion.change.toFixed(1))}%
                 </span>
               </div>
               <div className="status-item">
@@ -85,7 +85,7 @@ const SummaryCard = ({ data, location, isVisible, onClose, summaryData }) => {
 
             {summary.alerts && summary.alerts.length > 0 && (
               <div className="summary-alerts">
-                <h4>⚠️ Active Alerts</h4>
+                <h4>Active Alerts</h4>
                 <ul>
                   {summary.alerts.map((alert, index) => (
                     <li key={index} className="alert-summary">{alert}</li>
@@ -96,7 +96,7 @@ const SummaryCard = ({ data, location, isVisible, onClose, summaryData }) => {
           </div>
 
           <div className="recommendations">
-            <h4>🎯 Recommendations</h4>
+            <h4> Recommendations</h4>
             <ul>
               {summary.interventions.map((rec, index) => (
                 <li key={index}>{rec}</li>

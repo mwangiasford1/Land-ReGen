@@ -26,20 +26,32 @@ const Login = ({ onLogin, onForgotPassword, onCreateAccount }) => {
     };
 
     try {
-      const response = await fetch(`${API_BASE_URL}/login`, {
+      const url = `${API_BASE_URL}/login`;
+      if (!url.startsWith('http')) {
+        throw new Error('Invalid API URL');
+      }
+      
+      const response = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Origin': globalThis.location.origin
+        },
         body: JSON.stringify(sanitizedData)
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
 
-      if (data.success) {
+      if (data.success && data.token && data.user) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         onLogin(data.user);
       } else {
-        setError(data.error);
+        setError(data.error || 'Login failed');
       }
     } catch (err) {
       console.error('Login error:', err);
@@ -54,7 +66,7 @@ const Login = ({ onLogin, onForgotPassword, onCreateAccount }) => {
       <div className="wrapper">
         <div className="login-box">
           <form onSubmit={handleSubmit} className="auth-form">
-            <h2>🌱 Welcome to Land ReGen</h2>
+            <h2>Welcome to Land ReGen</h2>
             <p>Monitor soil health across Kenya</p>
 
             {error && <div className="error">{error}</div>}
@@ -82,7 +94,7 @@ const Login = ({ onLogin, onForgotPassword, onCreateAccount }) => {
             />
 
             <button type="submit" disabled={loading}>
-              {loading ? '🔄 Signing in...' : '🚀 Sign In'}
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
 
             <button type="button" onClick={onForgotPassword}>

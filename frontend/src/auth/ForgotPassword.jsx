@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import API_BASE_URL from '../config/api';
 import PropTypes from 'prop-types';
+import { isValidEmail } from '../utils/security';
 
 const ForgotPassword = ({ onBack }) => {
   const [email, setEmail] = useState('');
@@ -12,6 +13,12 @@ const ForgotPassword = ({ onBack }) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    if (!isValidEmail(email)) {
+      setError('Please enter a valid email address');
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch(`${API_BASE_URL}/forgot-password`, {
@@ -38,17 +45,17 @@ const ForgotPassword = ({ onBack }) => {
   if (sent) {
     return (
       <form className="auth-form">
-        <h2>📧 Check Your Email</h2>
+        <h2>Check Your Email</h2>
         <p style={{textAlign: 'center', color: '#666', marginBottom: '1.5rem'}}>
-          Password reset instructions sent to {email}
+          If an account exists with {email}, you will receive reset instructions.
         </p>
         
         <div className="success" style={{marginBottom: '1rem'}}>
-          ✅ Reset link sent! Check your inbox and spam folder.
+           Reset link sent! Check your inbox and spam folder.
         </div>
         
         <button type="button" onClick={onBack}>
-          ← Back to Login
+          Back to Login
         </button>
       </form>
     );
@@ -56,7 +63,7 @@ const ForgotPassword = ({ onBack }) => {
 
   return (
     <form onSubmit={handleSubmit} className="auth-form">
-      <h2>🔐 Reset Password</h2>
+      <h2> Reset Password</h2>
       <p style={{textAlign: 'center', color: '#666', marginBottom: '1.5rem'}}>
         Enter your email to receive reset instructions
       </p>
@@ -72,7 +79,7 @@ const ForgotPassword = ({ onBack }) => {
       />
       
       <button type="submit" disabled={loading}>
-        {loading ? '📤 Sending...' : '📧 Send Reset Link'}
+        {loading ? 'Sending...' : 'Send Reset Link'}
       </button>
       
       <button type="button" onClick={onBack} style={{
@@ -80,7 +87,7 @@ const ForgotPassword = ({ onBack }) => {
         color: '#666',
         marginTop: '10px'
       }}>
-        ← Back to Login
+        Back to Login
       </button>
     </form>
   );
